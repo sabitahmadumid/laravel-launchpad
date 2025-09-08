@@ -11,8 +11,9 @@ Perfect for SaaS applications, commercial Laravel products, or any Laravel appli
 
 ## ✨ Features
 
-- **🎯 3-Step Installation Process** - Simplified wizard with environment checks, license validation, and database setup
-- **🔄 Seamless Update System** - Safe and guided update process with progress tracking
+- **🎯 Installation Wizard** - 5-step guided installation process for fresh deployments
+- **🔄 Update Wizard** - 5-step guided update process for version upgrades  
+- **⚠️ Mutually Exclusive Modes** - Installation and update wizards are designed to run independently (never simultaneously)
 - **🛡️ License Validation** - Flexible license verification system with external server support
 - **⚙️ Environment Checking** - PHP version, extensions, and directory permissions validation
 - **🎨 Professional UI** - Modern, responsive interface built with Tailwind CSS and Alpine.js
@@ -147,21 +148,39 @@ You can add custom fields to the admin creation step:
 
 ## 🎯 Usage
 
-### Setting Up Installation
+> **⚠️ IMPORTANT: Installation vs Update Modes**
+> 
+> **Installation** and **Update** wizards are mutually exclusive and should NEVER be enabled simultaneously. This would create routing conflicts and confuse users. Choose the appropriate mode based on your deployment phase:
+>
+> - **Installation Mode**: For fresh deployments (new installs)
+> - **Update Mode**: For existing installations (version updates)
 
-1. **Add Routes** - The package automatically registers routes when not installed
-2. **Configure Settings** - Customize `config/launchpad.php` to match your needs
-3. **Set Up License Validation** - Configure your license server endpoint (optional)
+### Installation Mode (For New Deployments)
 
-### Installation Flow
+**When to use**: Deploying your Laravel application for the first time to end users.
 
-Once configured, users can install your application by visiting:
+**Configuration**:
+```php
+// config/launchpad.php
+'installation' => [
+    'enabled' => true,  // ✅ Enable installation wizard
+],
+'update' => [
+    'enabled' => false, // ❌ Disable update wizard
+],
+```
+
+**Setup Steps**:
+1. **Configure Settings** - Customize `config/launchpad.php` for installation
+2. **Set License Validation** - Configure your license server (optional)
+3. **Deploy Application** - Upload files WITHOUT running migrations
+4. **Share Install URL** - Provide users with `https://yourapp.com/install`
+
+**Installation Flow** - Users complete these steps:
 
 ```
 https://yourapp.com/install
 ```
-
-The installation process includes:
 
 1. **Welcome & Overview** - Introduction to the installation process
 2. **Environment Check** - Validates PHP version, extensions, and permissions
@@ -170,21 +189,80 @@ The installation process includes:
 5. **Admin Creation** - Creates the administrator account
 6. **Success** - Installation completion with admin panel access
 
-### Update Flow
+### Update Mode (For Existing Installations)
 
-For application updates, users can visit:
+**When to use**: Updating an already installed Laravel application to a newer version.
+
+**Configuration**:
+```php
+// config/launchpad.php
+'installation' => [
+    'enabled' => false, // ❌ Disable installation wizard
+],
+'update' => [
+    'enabled' => true,  // ✅ Enable update wizard
+    'current_version' => '2.0.0', // Your new version
+],
+```
+
+**Setup Steps**:
+1. **Switch to Update Mode** - Disable installation, enable updates
+2. **Upload New Files** - Replace application files with new version
+3. **Update Version** - Set `current_version` in config
+4. **Share Update URL** - Provide users with `https://yourapp.com/update`
+
+**Update Flow** - Users complete these steps:
 
 ```
 https://yourapp.com/update
 ```
-
-The update process includes:
 
 1. **Update Overview** - Shows current and target versions
 2. **Environment Check** - Ensures environment compatibility
 3. **License Verification** - Validates license for updates
 4. **Update Process** - Performs file updates, migrations, and optimizations
 5. **Success** - Update completion with celebration
+
+### Deployment Workflow Examples
+
+#### Scenario 1: Initial Product Launch
+```php
+// For first release v1.0.0
+'installation' => ['enabled' => true],
+'update' => ['enabled' => false],
+```
+
+#### Scenario 2: Releasing Update v1.1.0
+```php
+// For update release
+'installation' => ['enabled' => false],
+'update' => [
+    'enabled' => true,
+    'current_version' => '1.1.0',
+],
+```
+
+#### Scenario 3: Supporting Both (NOT RECOMMENDED)
+```php
+// ⚠️ DO NOT DO THIS - Will cause conflicts!
+'installation' => ['enabled' => true],  // ❌ BAD
+'update' => ['enabled' => true],        // ❌ BAD
+```
+
+### Environment Variables
+
+Control modes via environment variables:
+
+```env
+# For installation mode
+LAUNCHPAD_INSTALLATION_ENABLED=true
+LAUNCHPAD_UPDATE_ENABLED=false
+
+# For update mode  
+LAUNCHPAD_INSTALLATION_ENABLED=false
+LAUNCHPAD_UPDATE_ENABLED=true
+APP_VERSION=1.1.0
+```
 
 ### Middleware Protection
 
@@ -282,6 +360,92 @@ The package includes several security measures:
 2. **Secure your license server** with proper authentication
 3. **Validate user input** in custom fields
 4. **Use HTTPS** for license validation requests
+
+## 🔧 Troubleshooting
+
+### Common Configuration Issues
+
+#### ❌ Problem: Both Installation and Update Enabled
+```php
+// BAD - Will cause route conflicts!
+'installation' => ['enabled' => true],
+'update' => ['enabled' => true],
+```
+
+**Symptoms**:
+- Route conflicts and 404 errors
+- Users reaching wrong wizard
+- Middleware confusion
+
+**Solution**:
+```php
+// GOOD - Choose ONE mode
+'installation' => ['enabled' => true],  // For new installs
+'update' => ['enabled' => false],
+
+// OR for updates
+'installation' => ['enabled' => false],
+'update' => ['enabled' => true],
+```
+
+#### ❌ Problem: Wrong Mode for Deployment Phase
+
+**Scenario**: Enabling installation wizard for an update deployment
+
+**Solution**: Match the wizard to your deployment phase:
+- **Fresh deployment** → Installation mode
+- **Version update** → Update mode
+
+#### ❌ Problem: Users Can't Access Wizard
+
+**Symptoms**: 404 errors when visiting `/install` or `/update`
+
+**Check**:
+1. Correct mode is enabled in config
+2. Routes are not cached (`php artisan route:clear`)
+3. Web server is configured properly
+
+### Mode Switching Guide
+
+#### Switching from Installation to Update Mode
+
+After successful initial deployment:
+
+```php
+// config/launchpad.php - Change from:
+'installation' => ['enabled' => true],
+'update' => ['enabled' => false],
+
+// To:
+'installation' => ['enabled' => false],
+'update' => ['enabled' => true, 'current_version' => '1.1.0'],
+```
+
+#### Environment Variable Method
+
+```env
+# .env - Switch modes without code changes
+LAUNCHPAD_INSTALLATION_ENABLED=false
+LAUNCHPAD_UPDATE_ENABLED=true
+APP_VERSION=1.1.0
+```
+
+### Validation Commands
+
+Check your current configuration:
+
+```bash
+# Check installation status
+php artisan tinker
+>>> app(\SabitAhmad\LaravelLaunchpad\Services\InstallationService::class)->isInstalled()
+
+# Verify configuration
+>>> config('launchpad.installation.enabled')
+>>> config('launchpad.update.enabled')
+
+# List available routes
+php artisan route:list | grep launchpad
+```
 
 ## 🧪 Testing
 
