@@ -2,9 +2,13 @@
 
 namespace SabitAhmad\LaravelLaunchpad;
 
+use Illuminate\Support\Facades\Route;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use SabitAhmad\LaravelLaunchpad\Commands\LaravelLaunchpadCommand;
+use SabitAhmad\LaravelLaunchpad\Commands\PublishLicenseStubCommand;
+use SabitAhmad\LaravelLaunchpad\Http\Middleware\CheckInstallation;
+use SabitAhmad\LaravelLaunchpad\Http\Middleware\RedirectIfInstalled;
 
 class LaravelLaunchpadServiceProvider extends PackageServiceProvider
 {
@@ -19,7 +23,33 @@ class LaravelLaunchpadServiceProvider extends PackageServiceProvider
             ->name('laravel-launchpad')
             ->hasConfigFile()
             ->hasViews()
-            ->hasMigration('create_laravel_launchpad_table')
-            ->hasCommand(LaravelLaunchpadCommand::class);
+            ->hasRoute('web')
+            ->hasMigration('create_launchpad_table')
+            ->hasCommands([
+                LaravelLaunchpadCommand::class,
+                PublishLicenseStubCommand::class,
+            ]);
+    }
+
+    public function packageBooted(): void
+    {
+        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+        
+        // Register middleware
+        $this->app['router']->aliasMiddleware('check.installation', CheckInstallation::class);
+        $this->app['router']->aliasMiddleware('redirect.if.installed', RedirectIfInstalled::class);
+    }
+
+    public function packageRegistered(): void
+    {
+        $this->app->singleton('laravel-launchpad', function () {
+            return new LaravelLaunchpad();
+        });
+
+        // Register services
+        $this->app->bind(
+            \SabitAhmad\LaravelLaunchpad\Contracts\LicenseValidatorInterface::class,
+            \SabitAhmad\LaravelLaunchpad\Services\DefaultLicenseValidator::class
+        );
     }
 }

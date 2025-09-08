@@ -1,10 +1,14 @@
 {
     "name": "sabitahmadumid/laravel-launchpad",
-    "description": "This is my package laravel-launchpad",
+    "description": "Laravel Installation and Update Wizard Package - Ship your Laravel web app easily with automated installation and update wizards",
     "keywords": [
         "SabitAhmad",
         "laravel",
-        "laravel-launchpad"
+        "laravel-launchpad",
+        "installation-wizard",
+        "update-wizard",
+        "deployment",
+        "installer"
     ],
     "homepage": "https://github.com/sabitahmadumid/laravel-launchpad",
     "license": "MIT",
@@ -18,7 +22,8 @@
     "require": {
         "php": "^8.0",
         "spatie/laravel-package-tools": "^1.16",
-        "illuminate/contracts": "^11.0||^12.0"
+        "illuminate/contracts": "^11.0||^12.0",
+        "guzzlehttp/guzzle": "^7.0"
     },
     "require-dev": {
         "laravel/pint": "^1.14",
