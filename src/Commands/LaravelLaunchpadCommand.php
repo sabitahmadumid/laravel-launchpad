@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace SabitAhmad\LaravelLaunchpad\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class LaravelLaunchpadCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'laravel-launchpad';
 
     public $description = 'My command';
 
