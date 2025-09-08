@@ -28,6 +28,9 @@ class UpdateController extends Controller
         $this->licenseService = $licenseService;
     }
 
+    /**
+     * @return \Illuminate\View\View
+     */
     public function welcome()
     {
         $currentVersion = $this->getCurrentVersion();
@@ -36,6 +39,9 @@ class UpdateController extends Controller
         return view('launchpad::update.welcome', compact('currentVersion', 'newVersion'));
     }
 
+    /**
+     * @return \Illuminate\View\View
+     */
     public function requirements()
     {
         $requirements = $this->installationService->checkRequirements();
@@ -56,6 +62,9 @@ class UpdateController extends Controller
         ]);
     }
 
+    /**
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
     public function license()
     {
         if (! $this->licenseService->isLicenseRequired()) {
@@ -93,6 +102,9 @@ class UpdateController extends Controller
         return response()->json($result);
     }
 
+    /**
+     * @return \Illuminate\View\View
+     */
     public function update()
     {
         $updateOptions = config('launchpad.update_options', []);
@@ -151,6 +163,9 @@ class UpdateController extends Controller
         }
     }
 
+    /**
+     * @return \Illuminate\View\View
+     */
     public function success()
     {
         $newVersion = config('launchpad.update.current_version', '1.0.0');

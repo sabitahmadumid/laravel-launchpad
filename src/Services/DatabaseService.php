@@ -134,8 +134,9 @@ class DatabaseService
             ];
         }
 
-        return DB::connection()->getPdo() ?
-            DB::connection() :
-            new \Illuminate\Database\Capsule\Manager;
+        // Create a temporary connection to test with the provided config
+        config(['database.connections.temp_test' => $connectionConfig]);
+        
+        return DB::connection('temp_test');
     }
 }
