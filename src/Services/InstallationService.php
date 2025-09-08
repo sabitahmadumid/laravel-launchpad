@@ -3,13 +3,13 @@
 namespace SabitAhmad\LaravelLaunchpad\Services;
 
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 
 class InstallationService
 {
     public function isInstalled(): bool
     {
         $completedFile = config('launchpad.installation.completed_file');
+
         return File::exists($completedFile);
     }
 
@@ -17,11 +17,11 @@ class InstallationService
     {
         $completedFile = config('launchpad.installation.completed_file');
         $directory = dirname($completedFile);
-        
-        if (!File::exists($directory)) {
+
+        if (! File::exists($directory)) {
             File::makeDirectory($directory, 0755, true);
         }
-        
+
         File::put($completedFile, json_encode([
             'installed_at' => now()->toISOString(),
             'version' => config('launchpad.update.current_version', '1.0.0'),
@@ -31,12 +31,13 @@ class InstallationService
     public function getInstallationData(): ?array
     {
         $completedFile = config('launchpad.installation.completed_file');
-        
-        if (!File::exists($completedFile)) {
+
+        if (! File::exists($completedFile)) {
             return null;
         }
-        
+
         $content = File::get($completedFile);
+
         return json_decode($content, true);
     }
 
@@ -136,14 +137,14 @@ class InstallationService
         $requirements = $this->checkRequirements();
 
         // Check PHP version
-        if (isset($requirements['php']) && !$requirements['php']['meets_minimum']) {
+        if (isset($requirements['php']) && ! $requirements['php']['meets_minimum']) {
             return false;
         }
 
         // Check required extensions
         if (isset($requirements['extensions']['required'])) {
             foreach ($requirements['extensions']['required'] as $loaded) {
-                if (!$loaded) {
+                if (! $loaded) {
                     return false;
                 }
             }
@@ -152,7 +153,7 @@ class InstallationService
         // Check writable directories
         if (isset($requirements['directories'])) {
             foreach ($requirements['directories'] as $directory) {
-                if (!$directory['exists'] || !$directory['writable']) {
+                if (! $directory['exists'] || ! $directory['writable']) {
                     return false;
                 }
             }
@@ -161,7 +162,7 @@ class InstallationService
         // Check enabled functions
         if (isset($requirements['functions'])) {
             foreach ($requirements['functions'] as $enabled) {
-                if (!$enabled) {
+                if (! $enabled) {
                     return false;
                 }
             }

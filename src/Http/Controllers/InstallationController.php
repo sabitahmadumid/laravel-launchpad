@@ -14,7 +14,9 @@ use SabitAhmad\LaravelLaunchpad\Services\LicenseService;
 class InstallationController extends Controller
 {
     protected InstallationService $installationService;
+
     protected DatabaseService $databaseService;
+
     protected LicenseService $licenseService;
 
     public function __construct(
@@ -54,7 +56,7 @@ class InstallationController extends Controller
 
     public function license()
     {
-        if (!$this->licenseService->isLicenseRequired()) {
+        if (! $this->licenseService->isLicenseRequired()) {
             return redirect()->route('launchpad.install.database');
         }
 
@@ -63,7 +65,7 @@ class InstallationController extends Controller
 
     public function verifyLicense(Request $request)
     {
-        if (!$this->licenseService->isLicenseRequired()) {
+        if (! $this->licenseService->isLicenseRequired()) {
             return response()->json([
                 'success' => true,
                 'message' => 'License validation is disabled.',
@@ -92,7 +94,7 @@ class InstallationController extends Controller
     public function database()
     {
         $supportedDrivers = config('launchpad.database.supported_drivers', ['mysql']);
-        
+
         return view('launchpad::install.database', compact('supportedDrivers'));
     }
 
@@ -170,7 +172,7 @@ class InstallationController extends Controller
     public function final()
     {
         $databaseOptions = config('launchpad.database.import_options', []);
-        
+
         return view('launchpad::install.final', compact('databaseOptions'));
     }
 
@@ -212,7 +214,7 @@ class InstallationController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Installation failed: ' . $e->getMessage(),
+                'message' => 'Installation failed: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -220,7 +222,7 @@ class InstallationController extends Controller
     public function success()
     {
         $redirectUrl = config('launchpad.post_install.redirect_url', '/admin');
-        
+
         return view('launchpad::install.success', compact('redirectUrl'));
     }
 
@@ -239,7 +241,7 @@ class InstallationController extends Controller
             }
         }
 
-        if (!empty($envUpdates)) {
+        if (! empty($envUpdates)) {
             $this->updateEnvFile($envUpdates);
         }
     }
@@ -251,8 +253,8 @@ class InstallationController extends Controller
 
         foreach ($updates as $key => $value) {
             $pattern = "/^{$key}=.*/m";
-            $replacement = "{$key}=" . (empty($value) ? '""' : '"' . $value . '"');
-            
+            $replacement = "{$key}=".(empty($value) ? '""' : '"'.$value.'"');
+
             if (preg_match($pattern, $envContent)) {
                 $envContent = preg_replace($pattern, $replacement, $envContent);
             } else {
@@ -271,7 +273,7 @@ class InstallationController extends Controller
             $dumpConfig = config('launchpad.database.import_options.dump_file');
             if ($dumpConfig['enabled'] ?? false) {
                 $result = $this->databaseService->importDumpFile($dumpConfig['path']);
-                if (!$result['success']) {
+                if (! $result['success']) {
                     throw new \Exception($result['message']);
                 }
             }
@@ -279,14 +281,14 @@ class InstallationController extends Controller
 
         if (in_array('migrations', $options)) {
             $result = $this->databaseService->runMigrations();
-            if (!$result['success']) {
+            if (! $result['success']) {
                 throw new \Exception($result['message']);
             }
         }
 
         if (in_array('seeders', $options)) {
             $result = $this->databaseService->runSeeders();
-            if (!$result['success']) {
+            if (! $result['success']) {
                 throw new \Exception($result['message']);
             }
         }
@@ -295,14 +297,14 @@ class InstallationController extends Controller
     protected function createAdminUser()
     {
         $adminConfig = config('launchpad.admin');
-        if (!($adminConfig['enabled'] ?? false)) {
+        if (! ($adminConfig['enabled'] ?? false)) {
             return;
         }
 
         $adminData = session('admin_data', []);
         $userModel = $adminConfig['model'] ?? 'App\\Models\\User';
 
-        if (!class_exists($userModel)) {
+        if (! class_exists($userModel)) {
             throw new \Exception("User model {$userModel} not found");
         }
 
@@ -310,11 +312,11 @@ class InstallationController extends Controller
         foreach ($adminConfig['fields'] ?? [] as $field => $config) {
             if (isset($adminData[$field])) {
                 $value = $adminData[$field];
-                
+
                 if ($field === 'password') {
                     $value = Hash::make($value);
                 }
-                
+
                 $userData[$field] = $value;
             }
         }

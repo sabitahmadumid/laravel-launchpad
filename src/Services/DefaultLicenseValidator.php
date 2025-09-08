@@ -18,14 +18,14 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
 
     public function validate(string $licenseKey, array $additionalData = []): array
     {
-        if (!config('launchpad.license.enabled')) {
+        if (! config('launchpad.license.enabled')) {
             return [
                 'valid' => true,
                 'message' => 'License validation is disabled.',
             ];
         }
 
-        $cacheKey = 'launchpad_license_' . md5($licenseKey);
+        $cacheKey = 'launchpad_license_'.md5($licenseKey);
         $cacheDuration = config('launchpad.license.cache_duration', 3600);
 
         return Cache::remember($cacheKey, $cacheDuration, function () use ($licenseKey, $additionalData) {
@@ -36,8 +36,8 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
     protected function performValidation(string $licenseKey, array $additionalData): array
     {
         $serverUrl = config('launchpad.license.server_url');
-        
-        if (!$serverUrl) {
+
+        if (! $serverUrl) {
             return [
                 'valid' => false,
                 'message' => 'License server URL is not configured.',
@@ -65,12 +65,12 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
         } catch (RequestException $e) {
             return [
                 'valid' => false,
-                'message' => 'License server connection failed: ' . $e->getMessage(),
+                'message' => 'License server connection failed: '.$e->getMessage(),
             ];
         } catch (\Exception $e) {
             return [
                 'valid' => false,
-                'message' => 'License validation error: ' . $e->getMessage(),
+                'message' => 'License validation error: '.$e->getMessage(),
             ];
         }
     }

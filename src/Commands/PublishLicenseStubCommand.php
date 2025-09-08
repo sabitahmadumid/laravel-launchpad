@@ -8,22 +8,24 @@ use Illuminate\Support\Facades\File;
 class PublishLicenseStubCommand extends Command
 {
     protected $signature = 'launchpad:publish-license-stub';
+
     protected $description = 'Publish the license validator stub to the application';
 
     public function handle()
     {
-        $stubPath = __DIR__ . '/../../stubs/EnvatoLicenseChecker.php.stub';
+        $stubPath = __DIR__.'/../../stubs/EnvatoLicenseChecker.php.stub';
         $targetPath = app_path('Services/EnvatoLicenseChecker.php');
 
         if (File::exists($targetPath)) {
-            if (!$this->confirm('License validator already exists. Do you want to overwrite it?')) {
+            if (! $this->confirm('License validator already exists. Do you want to overwrite it?')) {
                 $this->info('License validator publishing cancelled.');
+
                 return;
             }
         }
 
         $targetDirectory = dirname($targetPath);
-        if (!File::exists($targetDirectory)) {
+        if (! File::exists($targetDirectory)) {
             File::makeDirectory($targetDirectory, 0755, true);
         }
 

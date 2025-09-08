@@ -2,10 +2,10 @@
 
 namespace SabitAhmad\LaravelLaunchpad\Services;
 
+use Exception;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Artisan;
-use Exception;
 
 class DatabaseService
 {
@@ -14,15 +14,15 @@ class DatabaseService
         try {
             $connection = $this->createConnection($config);
             $connection->getPdo();
-            
+
             return [
                 'success' => true,
-                'message' => 'Database connection successful!'
+                'message' => 'Database connection successful!',
             ];
         } catch (Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Database connection failed: ' . $e->getMessage()
+                'message' => 'Database connection failed: '.$e->getMessage(),
             ];
         }
     }
@@ -43,8 +43,8 @@ class DatabaseService
 
         foreach ($replacements as $key => $value) {
             $pattern = "/^{$key}=.*/m";
-            $replacement = "{$key}=" . (empty($value) ? '""' : $value);
-            
+            $replacement = "{$key}=".(empty($value) ? '""' : $value);
+
             if (preg_match($pattern, $envContent)) {
                 $envContent = preg_replace($pattern, $replacement, $envContent);
             } else {
@@ -59,15 +59,16 @@ class DatabaseService
     {
         try {
             Artisan::call('migrate', ['--force' => true]);
+
             return [
                 'success' => true,
                 'message' => 'Migrations completed successfully!',
-                'output' => Artisan::output()
+                'output' => Artisan::output(),
             ];
         } catch (Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Migration failed: ' . $e->getMessage()
+                'message' => 'Migration failed: '.$e->getMessage(),
             ];
         }
     }
@@ -76,15 +77,16 @@ class DatabaseService
     {
         try {
             Artisan::call('db:seed', ['--force' => true]);
+
             return [
                 'success' => true,
                 'message' => 'Seeders completed successfully!',
-                'output' => Artisan::output()
+                'output' => Artisan::output(),
             ];
         } catch (Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Seeder failed: ' . $e->getMessage()
+                'message' => 'Seeder failed: '.$e->getMessage(),
             ];
         }
     }
@@ -92,10 +94,10 @@ class DatabaseService
     public function importDumpFile(string $filePath): array
     {
         try {
-            if (!File::exists($filePath)) {
+            if (! File::exists($filePath)) {
                 return [
                     'success' => false,
-                    'message' => 'Dump file not found: ' . $filePath
+                    'message' => 'Dump file not found: '.$filePath,
                 ];
             }
 
@@ -104,12 +106,12 @@ class DatabaseService
 
             return [
                 'success' => true,
-                'message' => 'Database dump imported successfully!'
+                'message' => 'Database dump imported successfully!',
             ];
         } catch (Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Import failed: ' . $e->getMessage()
+                'message' => 'Import failed: '.$e->getMessage(),
             ];
         }
     }
@@ -132,8 +134,8 @@ class DatabaseService
             ];
         }
 
-        return DB::connection()->getPdo() ? 
-            DB::connection() : 
+        return DB::connection()->getPdo() ?
+            DB::connection() :
             new \Illuminate\Database\Capsule\Manager;
     }
 }

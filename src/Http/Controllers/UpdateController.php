@@ -13,7 +13,9 @@ use SabitAhmad\LaravelLaunchpad\Services\LicenseService;
 class UpdateController extends Controller
 {
     protected InstallationService $installationService;
+
     protected DatabaseService $databaseService;
+
     protected LicenseService $licenseService;
 
     public function __construct(
@@ -30,7 +32,7 @@ class UpdateController extends Controller
     {
         $currentVersion = $this->getCurrentVersion();
         $newVersion = config('launchpad.update.current_version', '1.0.0');
-        
+
         return view('launchpad::update.welcome', compact('currentVersion', 'newVersion'));
     }
 
@@ -56,7 +58,7 @@ class UpdateController extends Controller
 
     public function license()
     {
-        if (!$this->licenseService->isLicenseRequired()) {
+        if (! $this->licenseService->isLicenseRequired()) {
             return redirect()->route('launchpad.update.update');
         }
 
@@ -65,7 +67,7 @@ class UpdateController extends Controller
 
     public function verifyLicense(Request $request)
     {
-        if (!$this->licenseService->isLicenseRequired()) {
+        if (! $this->licenseService->isLicenseRequired()) {
             return response()->json([
                 'success' => true,
                 'message' => 'License validation is disabled.',
@@ -112,8 +114,8 @@ class UpdateController extends Controller
                 if ($dumpConfig['enabled'] ?? false) {
                     $result = $this->databaseService->importDumpFile($dumpConfig['path']);
                     $results['dump_file'] = $result;
-                    
-                    if (!$result['success']) {
+
+                    if (! $result['success']) {
                         throw new \Exception($result['message']);
                     }
                 }
@@ -123,8 +125,8 @@ class UpdateController extends Controller
             if (in_array('migrations', $options)) {
                 $result = $this->databaseService->runMigrations();
                 $results['migrations'] = $result;
-                
-                if (!$result['success']) {
+
+                if (! $result['success']) {
                     throw new \Exception($result['message']);
                 }
             }
@@ -144,7 +146,7 @@ class UpdateController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Update failed: ' . $e->getMessage(),
+                'message' => 'Update failed: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -152,17 +154,18 @@ class UpdateController extends Controller
     public function success()
     {
         $newVersion = config('launchpad.update.current_version', '1.0.0');
-        
+
         return view('launchpad::update.success', compact('newVersion'));
     }
 
     protected function getCurrentVersion(): string
     {
         $versionFile = config('launchpad.update.version_file');
-        
+
         if (File::exists($versionFile)) {
             $content = File::get($versionFile);
             $data = json_decode($content, true);
+
             return $data['version'] ?? '1.0.0';
         }
 
@@ -179,11 +182,11 @@ class UpdateController extends Controller
     {
         $versionFile = config('launchpad.update.version_file');
         $directory = dirname($versionFile);
-        
-        if (!File::exists($directory)) {
+
+        if (! File::exists($directory)) {
             File::makeDirectory($directory, 0755, true);
         }
-        
+
         File::put($versionFile, json_encode([
             'version' => config('launchpad.update.current_version', '1.0.0'),
             'updated_at' => now()->toISOString(),
