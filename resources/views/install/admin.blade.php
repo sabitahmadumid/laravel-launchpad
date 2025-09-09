@@ -235,6 +235,7 @@
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script>
@@ -347,4 +348,3 @@ function adminSetup() {
 }
 </script>
 @endpush
-@endsection

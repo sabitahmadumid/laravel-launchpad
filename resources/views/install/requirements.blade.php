@@ -203,6 +203,7 @@
         @endif
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script>
@@ -262,4 +263,3 @@ function requirementsChecker() {
 }
 </script>
 @endpush
-@endsection

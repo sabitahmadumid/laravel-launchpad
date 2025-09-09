@@ -150,6 +150,7 @@
         </form>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script>
@@ -230,4 +231,3 @@ function finalInstallation() {
 }
 </script>
 @endpush
-@endsection

@@ -157,6 +157,7 @@
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script>
@@ -230,4 +231,3 @@ function licenseVerifier() {
 }
 </script>
 @endpush
-@endsection
