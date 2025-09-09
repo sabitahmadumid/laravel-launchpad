@@ -121,7 +121,7 @@ class UpdateController extends Controller
         try {
             // Clear config cache first to ensure fresh config reading
             Artisan::call('config:clear');
-            
+
             $options = $request->get('update_options', []);
             $results = [];
 
