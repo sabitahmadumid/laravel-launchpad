@@ -172,8 +172,9 @@
                                 'text-green-800': connectionSuccess,
                                 'text-red-800': !connectionSuccess && connectionMessage
                             }">
-                                <span x-show="connectionSuccess">Connection Successful!</span>
-                                <span x-show="!connectionSuccess && connectionMessage">Connection Failed</span>
+                                <!-- Use only connectionMessage for both success and error -->
+                                <span x-show="connectionSuccess">Database Connection Successful!</span>
+                                <span x-show="!connectionSuccess && connectionMessage">Database Connection Failed</span>
                             </h4>
                             <p class="text-sm mt-1" :class="{
                                 'text-green-700': connectionSuccess,
@@ -290,7 +291,8 @@ function databaseConfiguration() {
             }
             
             this.loading = true;
-            this.connectionMessage = '';
+            // Reset connection status before testing
+            this.resetConnectionStatus();
             
             try {
                 const response = await fetch('{{ route("launchpad.install.database.test") }}', {
@@ -303,20 +305,48 @@ function databaseConfiguration() {
                 });
                 
                 const data = await response.json();
+                console.log('Database test response:', data); // Debug log
                 
-                this.connectionSuccess = data.success || false;
-                this.connectionMessage = data.message || '';
-                
-                if (this.connectionSuccess) {
-                    window.showNotification('Database connection successful!', 'success');
+                // Handle both success and validation error responses
+                if (response.ok && data.success) {
+                    this.connectionSuccess = true;
+                    this.connectionMessage = data.message || 'Database connection successful!';
+                    this.showNotification('Database connection successful!', 'success');
                 } else {
-                    window.showNotification(this.connectionMessage, 'error');
+                    this.connectionSuccess = false;
+                    this.connectionMessage = data.message || 'Database connection failed.';
+                    this.showNotification(this.connectionMessage, 'error');
                 }
+                
             } catch (error) {
+                console.error('Database test error:', error);
+                this.connectionSuccess = false;
                 this.connectionMessage = 'Error testing connection. Please try again.';
-                window.showNotification('Network error occurred', 'error');
+                this.showNotification('Network error occurred', 'error');
             } finally {
                 this.loading = false;
+            }
+        },
+
+        showNotification(message, type = 'info') {
+            // Use global showNotification if available, otherwise create a simple fallback
+            if (typeof window.showNotification === 'function') {
+                window.showNotification(message, type);
+            } else {
+                // Fallback notification system
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                    type === 'success' ? 'bg-green-500' : 
+                    type === 'error' ? 'bg-red-500' : 
+                    type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+                } text-white`;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
             }
         },
         
@@ -326,7 +356,14 @@ function databaseConfiguration() {
                 if (value && !this.config.port) {
                     this.config.port = this.getDefaultPort();
                 }
+                // Reset connection status when connection type changes
+                this.resetConnectionStatus();
             });
+
+            // Reset connection status when any config changes
+            this.$watch('config', () => {
+                this.resetConnectionStatus();
+            }, { deep: true });
         }
     }
 }

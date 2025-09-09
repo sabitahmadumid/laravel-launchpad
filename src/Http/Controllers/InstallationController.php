@@ -126,16 +126,23 @@ class InstallationController extends Controller
                 'success' => false,
                 'message' => 'Please fill all required fields.',
                 'errors' => $validator->errors(),
-            ], 422);
+            ], 200); // Return 200 instead of 422 to avoid JavaScript catch block
         }
 
-        $result = $this->databaseService->testConnection($request->all());
+        try {
+            $result = $this->databaseService->testConnection($request->all());
 
-        if ($result['success']) {
-            session(['database_config' => $request->all()]);
+            if ($result['success']) {
+                session(['database_config' => $request->all()]);
+            }
+
+            return response()->json($result);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Database test failed: '.$e->getMessage(),
+            ]);
         }
-
-        return response()->json($result);
     }
 
     /**

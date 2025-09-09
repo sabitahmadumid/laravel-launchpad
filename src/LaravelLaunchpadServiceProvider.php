@@ -20,7 +20,7 @@ class LaravelLaunchpadServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('laravel-launchpad')
-            ->hasConfigFile()
+            ->hasConfigFile('launchpad')
             ->hasViews()
             ->hasRoute('web')
             ->hasMigration('create_launchpad_table')
@@ -37,6 +37,26 @@ class LaravelLaunchpadServiceProvider extends PackageServiceProvider
         // Register middleware
         $this->app['router']->aliasMiddleware('check.installation', CheckInstallation::class);
         $this->app['router']->aliasMiddleware('redirect.if.installed', RedirectIfInstalled::class);
+
+        // Explicitly publish config file with tag
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../config/launchpad.php' => config_path('launchpad.php'),
+            ], 'laravel-launchpad-config');
+
+            $this->publishes([
+                __DIR__.'/../resources/views' => resource_path('views/vendor/launchpad'),
+            ], 'laravel-launchpad-views');
+
+            // Also register without specific tags for --all option
+            $this->publishes([
+                __DIR__.'/../config/launchpad.php' => config_path('launchpad.php'),
+            ], 'config');
+
+            $this->publishes([
+                __DIR__.'/../resources/views' => resource_path('views/vendor/launchpad'),
+            ], 'views');
+        }
     }
 
     public function packageRegistered(): void

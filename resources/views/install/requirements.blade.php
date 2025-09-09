@@ -225,15 +225,37 @@ function requirementsChecker() {
                 const data = await response.json();
                 
                 if (data.success) {
-                    window.showNotification('Requirements check completed!', 'success');
+                    this.showNotification('Requirements check completed!', 'success');
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
-                    window.showNotification(data.message, 'warning');
+                    this.showNotification(data.message, 'warning');
                 }
             } catch (error) {
-                window.showNotification('Error checking requirements', 'error');
+                this.showNotification('Error checking requirements', 'error');
             } finally {
                 this.loading = false;
+            }
+        },
+
+        showNotification(message, type = 'info') {
+            // Use global showNotification if available, otherwise create a simple fallback
+            if (typeof window.showNotification === 'function') {
+                window.showNotification(message, type);
+            } else {
+                // Fallback notification system
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                    type === 'success' ? 'bg-green-500' : 
+                    type === 'error' ? 'bg-red-500' : 
+                    type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+                } text-white`;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
             }
         }
     }

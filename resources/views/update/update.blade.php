@@ -215,12 +215,34 @@ function updateRunner() {
                 } else {
                     this.errorMessage = data.message || 'Update failed. Please try again.';
                     this.updating = false;
-                    window.showNotification(this.errorMessage, 'error');
+                    this.showNotification(this.errorMessage, 'error');
                 }
             } catch (error) {
                 this.errorMessage = 'Network error occurred. Please try again.';
                 this.updating = false;
-                window.showNotification('Network error occurred', 'error');
+                this.showNotification('Network error occurred', 'error');
+            }
+        },
+
+        showNotification(message, type = 'info') {
+            // Use global showNotification if available, otherwise create a simple fallback
+            if (typeof window.showNotification === 'function') {
+                window.showNotification(message, type);
+            } else {
+                // Fallback notification system
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                    type === 'success' ? 'bg-green-500' : 
+                    type === 'error' ? 'bg-red-500' : 
+                    type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+                } text-white`;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
             }
         }
     }
