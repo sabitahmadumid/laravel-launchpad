@@ -1,38 +1,6 @@
 # 🚀 Laravel Launchpad
 
-[![Latest Version on Packagist](https://img.shields.io> **🚧 Screenshots Coming Soon**: We're currently preparing high-quality screenshots to showcase the package. Screenshots will be added in the next release. See [contributing guidelines](#-contributing-screenshots) if you'd like to help!
-
-## 🎨 Design & User Experience
-
-Laravel Launchpad features a **modern, professional interface** designed for both technical and non-technical users:
-
-### Visual Design
-- **🎯 Clean & Intuitive**: Minimalist design focusing on clarity and ease of use
-- **🎨 Tailwind CSS**: Modern utility-first CSS framework for consistent styling
-- **📱 Fully Responsive**: Perfect experience on desktop, tablet, and mobile devices
-- **🌟 Professional Appearance**: Polished interface suitable for commercial applications
-
-### Interactive Elements
-- **⚡ Alpine.js Integration**: Smooth, reactive user interactions without page reloads
-- **📊 Progress Indicators**: Clear visual feedback showing completion status
-- **✅ Real-time Validation**: Instant feedback on form inputs and requirements
-- **🎉 Success Animations**: Celebration effects for completed installations/updates
-- **🔄 Loading States**: Professional loading indicators during operations
-
-### User Experience Features
-- **🗺️ Step-by-Step Guidance**: Clear progress through each wizard phase
-- **📝 Contextual Help**: Helpful tooltips and instructions throughout
-- **⚠️ Error Handling**: User-friendly error messages with actionable guidance
-- **🎯 Smart Defaults**: Sensible default values to minimize user input
-- **🔍 Validation Feedback**: Clear indicators for requirements and field validation
-
-### Customization Options
-- **🎨 Blade Templates**: Fully customizable views using Laravel Blade
-- **🎛️ Configuration-Driven**: Modify appearance and behavior through config files
-- **🌈 Theme Flexibility**: Easy to adapt to your application's design system
-- **🔧 Component Override**: Replace individual components while keeping the wizard flow
-
-## 📋 Requirementsckagist/v/sabitahmadumid/laravel-launchpad.svg?style=flat-square)](https://packagist.org/packages/sabitahmadumid/laravel-launchpad)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/sabitahmadumid/laravel-launchpad.svg?style=flat-square)](https://packagist.org/packages/sabitahmadumid/laravel-launchpad)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/sabitahmadumid/laravel-launchpad/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/sabitahmadumid/laravel-launchpad/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/sabitahmadumid/laravel-launchpad/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/sabitahmadumid/laravel-launchpad/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/sabitahmadumid/laravel-launchpad.svg?style=flat-square)](https://packagist.org/packages/sabitahmadumid/laravel-launchpad)
@@ -40,6 +8,20 @@ Laravel Launchpad features a **modern, professional interface** designed for bot
 **Laravel Launchpad** is a comprehensive installation and update wizard package that makes it incredibly easy for developers to ship their Laravel applications and for end-users to install them. With professional UI components, license validation, environment checking, and a streamlined automatic process, Launchpad transforms complex deployments into simple, guided experiences.
 
 Perfect for SaaS applications, commercial Laravel products, or any Laravel application that needs professional installation and update capabilities.
+
+## 📸 Screenshots
+
+<div align="center">
+
+### Installation Wizard
+![Laravel Launchpad Installation Wizard](https://raw.githubusercontent.com/sabitahmadumid/laravel-launchpad/main/.github/screenshots/install.png)
+
+### Update Wizard
+![Laravel Launchpad Update Wizard](https://raw.githubusercontent.com/sabitahmadumid/laravel-launchpad/main/.github/screenshots/update.png)
+
+</div>
+
+> **📝 Note**: Screenshots show the default Tailwind CSS styling. All views are fully customizable through Blade templates.
 
 ## ✨ Features
 
@@ -56,17 +38,7 @@ Perfect for SaaS applications, commercial Laravel products, or any Laravel appli
 - **📱 Mobile Responsive** - Works perfectly on all devices and screen sizes
 - **🎉 User Experience** - Smooth animations, progress indicators, and celebration effects
 
-## � Screenshots
-
-### Installation Wizard
-![Laravel Launchpad Installation Wizard](https://raw.githubusercontent.com/sabitahmadumid/laravel-launchpad/main/.github/screenshots/install.png)
-
-### Update Wizard
-![Laravel Launchpad Update Wizard](https://raw.githubusercontent.com/sabitahmadumid/laravel-launchpad/main/.github/screenshots/update.png)
-
-> **📝 Note**: Screenshots show the default Tailwind CSS styling. All views are fully customizable through Blade templates.
-
-## �📋 Requirements
+## 📋 Requirements
 
 - PHP 8.1 or higher
 - Laravel 10.0 or higher
@@ -749,17 +721,6 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 ## 🤝 Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
-
-### 📸 Contributing Screenshots
-
-We welcome high-quality screenshots that showcase the package! If you'd like to contribute screenshots:
-
-1. **Setup**: Install Laravel Launchpad in a clean Laravel application
-2. **Capture**: Take clear, professional screenshots following the guidelines in [`.github/screenshots/README.md`](.github/screenshots/README.md)
-3. **Submit**: Open a pull request with your screenshots
-4. **Naming**: Follow the naming convention specified in the screenshots directory
-
-Your screenshots will help other developers understand the package capabilities and professional appearance.
 
 ## 🔒 Security Vulnerabilities
 
