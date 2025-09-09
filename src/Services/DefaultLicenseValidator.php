@@ -62,14 +62,14 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
             // Get domain and IP from request context or use defaults
             $domain = parse_url(config('app.url', 'localhost'), PHP_URL_HOST);
             $ip = '127.0.0.1';
-            
+
             // Try to get more specific info if we're in a web request context
             if (app()->bound('request')) {
                 $request = app('request');
                 $domain = $request->getHost();
                 $ip = $request->ip();
             }
-            
+
             $response = $this->httpClient->post($serverUrl, [
                 'timeout' => config('launchpad.license.timeout', 30),
                 'json' => array_merge([
