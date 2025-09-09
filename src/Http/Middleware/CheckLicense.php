@@ -14,15 +14,15 @@ class CheckLicense
     public function handle(Request $request, Closure $next): Response
     {
         $licenseEnabled = config('launchpad.license.enabled', false);
-        
+
         // If license is not enabled, allow access
-        if (!$licenseEnabled) {
+        if (! $licenseEnabled) {
             return $next($request);
         }
 
         // Check if license has been verified in session
         $licenseVerified = session('license_verified', false);
-        
+
         // Allow access to license verification routes
         $allowedRoutes = [
             'launchpad.install.welcome',
@@ -31,7 +31,7 @@ class CheckLicense
             'launchpad.install.license',
             'launchpad.install.license.verify',
             'launchpad.update.welcome',
-            'launchpad.update.requirements', 
+            'launchpad.update.requirements',
             'launchpad.update.requirements.check',
             'launchpad.update.license',
             'launchpad.update.license.verify',
@@ -42,10 +42,10 @@ class CheckLicense
         }
 
         // If license is not verified, redirect to license verification
-        if (!$licenseVerified) {
+        if (! $licenseVerified) {
             $isInstallRoute = str_contains($request->route()->getName(), 'install');
             $redirectRoute = $isInstallRoute ? 'launchpad.install.license' : 'launchpad.update.license';
-            
+
             return redirect()->route($redirectRoute)->with('error', 'Please verify your license to continue.');
         }
 

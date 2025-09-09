@@ -154,7 +154,7 @@ class InstallationController extends Controller
         try {
             // Validate that database connection was tested first
             $databaseConfig = session('database_config');
-            if (!$databaseConfig) {
+            if (! $databaseConfig) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Please test database connection first.',
@@ -270,7 +270,7 @@ class InstallationController extends Controller
 
             // Mark as installed ONLY after everything succeeds
             $this->installationService->markAsInstalled();
-            
+
             // Disable installation routes for security
             $this->disableInstallationRoutes();
 
@@ -313,16 +313,16 @@ class InstallationController extends Controller
             // Read current database configuration from environment
             $currentDbConfig = [
                 'connection' => config('database.default'),
-                'host' => config('database.connections.' . config('database.default') . '.host'),
-                'port' => config('database.connections.' . config('database.default') . '.port'),
-                'database' => config('database.connections.' . config('database.default') . '.database'),
-                'username' => config('database.connections.' . config('database.default') . '.username'),
-                'password' => config('database.connections.' . config('database.default') . '.password'),
+                'host' => config('database.connections.'.config('database.default').'.host'),
+                'port' => config('database.connections.'.config('database.default').'.port'),
+                'database' => config('database.connections.'.config('database.default').'.database'),
+                'username' => config('database.connections.'.config('database.default').'.username'),
+                'password' => config('database.connections.'.config('database.default').'.password'),
             ];
-            
+
             $result = $this->databaseService->testConnection($currentDbConfig);
-            if (!$result['success']) {
-                throw new \Exception('Database connection test failed: ' . $result['message']);
+            if (! $result['success']) {
+                throw new \Exception('Database connection test failed: '.$result['message']);
             }
         } catch (\Exception $e) {
             throw new \Exception('Database configuration not found or invalid. Please complete database setup first.');
@@ -331,7 +331,7 @@ class InstallationController extends Controller
         // Check if license is required and verified
         $licenseConfig = config('launchpad.license', []);
         if ($licenseConfig['enabled'] ?? false) {
-            if (!session('license_verified')) {
+            if (! session('license_verified')) {
                 throw new \Exception('License verification required but not completed');
             }
         }
@@ -340,13 +340,13 @@ class InstallationController extends Controller
         $adminConfig = config('launchpad.admin', []);
         if ($adminConfig['enabled'] ?? false) {
             $adminData = session('admin_data');
-            if (!$adminData) {
+            if (! $adminData) {
                 throw new \Exception('Admin user data not found. Please complete admin setup first.');
             }
         }
     }
 
-    protected function updateAdditionalEnvVars(Request $request = null)
+    protected function updateAdditionalEnvVars(?Request $request = null)
     {
         $adminData = $request ? $request->all() : session('admin_data', []);
         $additionalFields = config('launchpad.additional_fields', []);
@@ -396,7 +396,7 @@ class InstallationController extends Controller
             if ($dumpConfig['enabled'] ?? false) {
                 $result = $this->databaseService->importDumpFile($dumpConfig['path']);
                 if (! $result['success']) {
-                    throw new \Exception('Database dump import failed: ' . $result['message']);
+                    throw new \Exception('Database dump import failed: '.$result['message']);
                 }
             } else {
                 throw new \Exception('SQL dump import is not enabled in configuration');
@@ -409,7 +409,7 @@ class InstallationController extends Controller
             if ($migrationsConfig['enabled'] ?? false) {
                 $result = $this->databaseService->runMigrations();
                 if (! $result['success']) {
-                    throw new \Exception('Database migration failed: ' . $result['message']);
+                    throw new \Exception('Database migration failed: '.$result['message']);
                 }
             } else {
                 throw new \Exception('Migrations are not enabled in configuration');
@@ -422,7 +422,7 @@ class InstallationController extends Controller
             if ($seedersConfig['enabled'] ?? false) {
                 $result = $this->databaseService->runSeeders();
                 if (! $result['success']) {
-                    throw new \Exception('Database seeding failed: ' . $result['message']);
+                    throw new \Exception('Database seeding failed: '.$result['message']);
                 }
             } else {
                 // Don't throw error for seeders, just skip silently
@@ -522,7 +522,7 @@ class InstallationController extends Controller
             Artisan::call('view:cache');
         }
     }
-    
+
     /**
      * Disable installation routes by setting the installation enabled flag to false in config
      */
@@ -530,29 +530,29 @@ class InstallationController extends Controller
     {
         try {
             $configPath = config_path('launchpad.php');
-            
+
             if (File::exists($configPath)) {
                 $content = File::get($configPath);
-                
+
                 // Update the 'enabled' => false in the installation section
                 $pattern = "/('installation'\s*=>\s*\[(?:[^[\]]*(?:\[[^\]]*\])*)*'enabled'\s*=>\s*)true/s";
                 $replacement = '${1}false';
-                
+
                 $updatedContent = preg_replace($pattern, $replacement, $content);
-                
+
                 if ($updatedContent && $updatedContent !== $content) {
                     File::put($configPath, $updatedContent);
-                    
+
                     // Clear config cache to ensure the new setting takes effect
                     Artisan::call('config:clear');
-                    
+
                     // Also set in runtime config
                     Config::set('launchpad.installation.enabled', false);
                 }
             }
         } catch (\Exception $e) {
             // Log the error but don't fail the installation process
-            Log::warning('Failed to disable installation routes: ' . $e->getMessage());
+            Log::warning('Failed to disable installation routes: '.$e->getMessage());
         }
     }
 }

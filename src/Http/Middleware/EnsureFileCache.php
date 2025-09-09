@@ -18,7 +18,7 @@ class EnsureFileCache
     public function handle(Request $request, Closure $next)
     {
         // Force file-based cache during installation to avoid database dependency
-        if (!$this->installationService->isInstalled()) {
+        if (! $this->installationService->isInstalled()) {
             $this->ensureFileCacheConfiguration();
         }
 
@@ -32,14 +32,14 @@ class EnsureFileCache
     {
         // Ensure cache storage directory exists
         $cachePath = storage_path('framework/cache/data');
-        if (!file_exists($cachePath)) {
+        if (! file_exists($cachePath)) {
             mkdir($cachePath, 0755, true);
         }
 
         // Only reconfigure if we're not already using file cache
         if (config('cache.default') !== 'file') {
             // Store original config for potential restoration
-            if (!app()->bound('original_cache_config')) {
+            if (! app()->bound('original_cache_config')) {
                 app()->singleton('original_cache_config', function () {
                     return [
                         'default' => config('cache.default'),
@@ -65,7 +65,7 @@ class EnsureFileCache
         if (app()->resolved('cache')) {
             app()->forgetInstance('cache');
         }
-        
+
         if (app()->resolved('cache.store')) {
             app()->forgetInstance('cache.store');
         }

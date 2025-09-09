@@ -201,7 +201,7 @@ class UpdateController extends Controller
     protected function updateVersionFile(): void
     {
         $newVersion = config('launchpad.update.current_version', '1.0.0');
-        
+
         // Update version file
         $versionFile = config('launchpad.update.version_file');
         $directory = dirname($versionFile);
@@ -214,11 +214,11 @@ class UpdateController extends Controller
             'version' => $newVersion,
             'updated_at' => now()->toISOString(),
         ]));
-        
+
         // Also update the config file with the new version for future updates
         $this->updateVersionInConfig($newVersion);
     }
-    
+
     /**
      * Update the current version in the config file
      */
@@ -226,25 +226,25 @@ class UpdateController extends Controller
     {
         try {
             $configPath = config_path('launchpad.php');
-            
+
             if (File::exists($configPath)) {
                 $content = File::get($configPath);
-                
+
                 // Update the 'current_version' in the update section
                 $pattern = "/('update'\s*=>\s*\[(?:[^[\]]*(?:\[[^\]]*\])*)*'current_version'\s*=>\s*)'[^']*'/s";
                 $replacement = "\${1}'$newVersion'";
-                
+
                 $updatedContent = preg_replace($pattern, $replacement, $content);
-                
+
                 if ($updatedContent && $updatedContent !== $content) {
                     File::put($configPath, $updatedContent);
-                    
+
                     // Set in runtime config
                     Config::set('launchpad.update.current_version', $newVersion);
                 }
             }
         } catch (\Exception $e) {
-            Log::warning('Failed to update version in config: ' . $e->getMessage());
+            Log::warning('Failed to update version in config: '.$e->getMessage());
         }
     }
 
@@ -268,29 +268,29 @@ class UpdateController extends Controller
     {
         try {
             $configPath = config_path('launchpad.php');
-            
+
             if (File::exists($configPath)) {
                 $content = File::get($configPath);
-                
+
                 // Update the 'enabled' => false in the update section
                 $pattern = "/('update'\s*=>\s*\[(?:[^[\]]*(?:\[[^\]]*\])*)*'enabled'\s*=>\s*)true/s";
                 $replacement = '${1}false';
-                
+
                 $updatedContent = preg_replace($pattern, $replacement, $content);
-                
+
                 if ($updatedContent && $updatedContent !== $content) {
                     File::put($configPath, $updatedContent);
-                    
+
                     // Clear config cache to ensure the new setting takes effect
                     Artisan::call('config:clear');
-                    
+
                     // Also set in runtime config
                     Config::set('launchpad.update.enabled', false);
                 }
             }
         } catch (\Exception $e) {
             // Log the error but don't fail the update process
-            Log::warning('Failed to disable update routes: ' . $e->getMessage());
+            Log::warning('Failed to disable update routes: '.$e->getMessage());
         }
     }
 }

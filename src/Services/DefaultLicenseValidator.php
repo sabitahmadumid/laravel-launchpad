@@ -10,6 +10,7 @@ use SabitAhmad\LaravelLaunchpad\Contracts\LicenseValidatorInterface;
 class DefaultLicenseValidator implements LicenseValidatorInterface
 {
     protected Client $httpClient;
+
     protected InstallationService $installationService;
 
     public function __construct(Client $httpClient, InstallationService $installationService)
@@ -28,7 +29,7 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
         }
 
         // During installation, skip caching to avoid database dependency
-        if (!$this->installationService->isInstalled()) {
+        if (! $this->installationService->isInstalled()) {
             return $this->performValidation($licenseKey, $additionalData);
         }
 

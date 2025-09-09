@@ -30,14 +30,14 @@ class DatabaseService
     public function updateEnvFile(array $config): void
     {
         $envFile = base_path('.env');
-        
-        if (!file_exists($envFile)) {
+
+        if (! file_exists($envFile)) {
             throw new \Exception('.env file not found');
         }
 
         // Create backup of .env file
-        $backupFile = $envFile . '.backup.' . time();
-        if (!copy($envFile, $backupFile)) {
+        $backupFile = $envFile.'.backup.'.time();
+        if (! copy($envFile, $backupFile)) {
             throw new \Exception('Could not create .env backup file');
         }
 
@@ -66,7 +66,7 @@ class DatabaseService
                 }
             }
 
-            if (!File::put($envFile, $envContent)) {
+            if (! File::put($envFile, $envContent)) {
                 throw new \Exception('Could not write to .env file');
             }
 
@@ -79,7 +79,7 @@ class DatabaseService
                 copy($backupFile, $envFile);
                 @unlink($backupFile);
             }
-            throw new \Exception('Failed to update .env file: ' . $e->getMessage());
+            throw new \Exception('Failed to update .env file: '.$e->getMessage());
         }
     }
 
@@ -88,7 +88,7 @@ class DatabaseService
         try {
             // Clear any cached config to ensure fresh database connection
             Artisan::call('config:clear');
-            
+
             // Run migrations with force flag
             Artisan::call('migrate', ['--force' => true]);
 
@@ -110,7 +110,7 @@ class DatabaseService
         try {
             // Ensure database connection is fresh
             Artisan::call('config:clear');
-            
+
             // Run seeders with force flag
             Artisan::call('db:seed', ['--force' => true]);
 
@@ -172,7 +172,7 @@ class DatabaseService
 
         // Create a temporary connection to test with the provided config
         config(['database.connections.temp_test' => $connectionConfig]);
-        
+
         return DB::connection('temp_test');
     }
 }

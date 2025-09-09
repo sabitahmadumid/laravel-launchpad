@@ -18,7 +18,7 @@ class EnsureFileSession
     public function handle(Request $request, Closure $next)
     {
         // Force file-based sessions during installation to avoid database dependency
-        if (!$this->installationService->isInstalled()) {
+        if (! $this->installationService->isInstalled()) {
             $this->ensureFileSessionConfiguration();
         }
 
@@ -32,14 +32,14 @@ class EnsureFileSession
     {
         // Ensure session storage directory exists
         $sessionPath = storage_path('framework/sessions');
-        if (!file_exists($sessionPath)) {
+        if (! file_exists($sessionPath)) {
             mkdir($sessionPath, 0755, true);
         }
 
         // Only reconfigure if we're not already using file sessions
         if (config('session.driver') !== 'file') {
             // Store original config for potential restoration
-            if (!app()->bound('original_session_config')) {
+            if (! app()->bound('original_session_config')) {
                 app()->singleton('original_session_config', function () {
                     return [
                         'driver' => config('session.driver'),
@@ -69,7 +69,7 @@ class EnsureFileSession
         if (app()->resolved('session')) {
             app()->forgetInstance('session');
         }
-        
+
         if (app()->resolved('session.store')) {
             app()->forgetInstance('session.store');
         }
