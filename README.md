@@ -99,6 +99,22 @@ return [
         'test_connection' => true,
         'default_charset' => 'utf8mb4',
         'default_collation' => 'utf8mb4_unicode_ci',
+        'import_options' => [
+            // ⚠️ IMPORTANT: Choose ONE database setup method
+            'dump_file' => [
+                'enabled' => true,  // ✅ Use SQL dump import
+                'path' => database_path('dump.sql'),
+                'description' => 'Import initial database dump',
+            ],
+            'migrations' => [
+                'enabled' => false, // ❌ Disable when using dump
+                'description' => 'Run database migrations',
+            ],
+            'seeders' => [
+                'enabled' => true,  // Optional: Can be used with either method
+                'description' => 'Run database seeders',
+            ],
+        ],
     ],
     
     'admin_fields' => [
@@ -143,6 +159,152 @@ You can add custom fields to the admin creation step:
         'type' => 'tel',
         'required' => false,
     ],
+],
+```
+
+### Database Setup Methods
+
+> **⚠️ IMPORTANT: Database Import Conflicts**
+> 
+> **SQL Dumps** and **Migrations** are mutually exclusive and should NEVER be enabled simultaneously. This would cause database conflicts and unpredictable behavior. Choose the appropriate method based on your application structure:
+>
+> - **SQL Dump Method**: For applications with complex initial data or specific database structure
+> - **Migrations Method**: For applications using Laravel's migration system
+
+#### Method 1: SQL Dump Import (Recommended for Complex Apps)
+
+**When to use**: Applications with complex initial data, views, stored procedures, or non-Laravel database structures.
+
+```php
+// config/launchpad.php - Database configuration
+'database' => [
+    'import_options' => [
+        'dump_file' => [
+            'enabled' => true,  // ✅ Enable SQL dump import
+            'path' => database_path('dump.sql'),
+            'description' => 'Import initial database dump',
+        ],
+        'migrations' => [
+            'enabled' => false, // ❌ Disable migrations when using dump
+            'description' => 'Run database migrations',
+        ],
+        'seeders' => [
+            'enabled' => true,  // ✅ Optional: Additional seed data
+            'description' => 'Run database seeders',
+        ],
+    ],
+],
+```
+
+**Setup Steps**:
+1. **Create Database Dump**: Export your complete database structure and data
+2. **Place Dump File**: Save as `database/dump.sql` (or configure custom path)
+3. **Configure Settings**: Enable dump import, disable migrations
+4. **Test Import**: Ensure dump file imports successfully
+
+**Advantages**:
+- ✅ Handles complex database structures
+- ✅ Includes initial data and configurations
+- ✅ Faster installation for large datasets
+- ✅ Works with non-Laravel database designs
+
+#### Method 2: Laravel Migrations (Recommended for Standard Laravel Apps)
+
+**When to use**: Standard Laravel applications using migration system for database structure.
+
+```php
+// config/launchpad.php - Database configuration
+'database' => [
+    'import_options' => [
+        'dump_file' => [
+            'enabled' => false, // ❌ Disable dump when using migrations
+            'path' => database_path('dump.sql'),
+            'description' => 'Import initial database dump',
+        ],
+        'migrations' => [
+            'enabled' => true,  // ✅ Enable Laravel migrations
+            'description' => 'Run database migrations',
+        ],
+        'seeders' => [
+            'enabled' => true,  // ✅ Run database seeders after migrations
+            'description' => 'Run database seeders',
+        ],
+    ],
+],
+```
+
+**Setup Steps**:
+1. **Prepare Migrations**: Ensure all migration files are ready
+2. **Create Seeders**: Prepare initial data seeders (optional)
+3. **Configure Settings**: Enable migrations, disable dump import
+4. **Test Migrations**: Verify migrations run successfully
+
+**Advantages**:
+- ✅ Version-controlled database changes
+- ✅ Laravel-native approach
+- ✅ Easier to maintain and update
+- ✅ Better for team development
+
+#### Update Process Database Methods
+
+For updates, you can also choose between SQL dumps or migrations:
+
+```php
+// config/launchpad.php - Update configuration
+'update_options' => [
+    // For SQL-based updates
+    'dump_file' => [
+        'enabled' => true,  // ✅ Use update SQL file
+        'path' => database_path('updates/update.sql'),
+        'description' => 'Import update database dump',
+    ],
+    'migrations' => [
+        'enabled' => false, // ❌ Disable when using dump
+        'description' => 'Run update migrations',
+    ],
+    
+    // OR for migration-based updates
+    'dump_file' => [
+        'enabled' => false, // ❌ Disable when using migrations
+        'path' => database_path('updates/update.sql'),
+        'description' => 'Import update database dump',
+    ],
+    'migrations' => [
+        'enabled' => true,  // ✅ Use Laravel migrations
+        'description' => 'Run update migrations',
+    ],
+],
+```
+
+#### Database Configuration Examples
+
+**Example 1: E-commerce App with Complex Data**
+```php
+// Uses SQL dump for complex product catalogs and configurations
+'import_options' => [
+    'dump_file' => ['enabled' => true, 'path' => database_path('ecommerce.sql')],
+    'migrations' => ['enabled' => false],
+    'seeders' => ['enabled' => true], // Additional demo products
+],
+```
+
+**Example 2: Standard Laravel CRM**
+```php
+// Uses migrations for clean, version-controlled structure
+'import_options' => [
+    'dump_file' => ['enabled' => false],
+    'migrations' => ['enabled' => true],
+    'seeders' => ['enabled' => true], // Demo contacts and companies
+],
+```
+
+**Example 3: Legacy Database Integration**
+```php
+// Uses SQL dump to preserve existing database structure
+'import_options' => [
+    'dump_file' => ['enabled' => true, 'path' => database_path('legacy.sql')],
+    'migrations' => ['enabled' => false],
+    'seeders' => ['enabled' => false], // Data already in dump
 ],
 ```
 
@@ -388,6 +550,44 @@ The package includes several security measures:
 'update' => ['enabled' => true],
 ```
 
+#### ❌ Problem: Both SQL Dump and Migrations Enabled
+```php
+// BAD - Will cause database conflicts!
+'import_options' => [
+    'dump_file' => ['enabled' => true],   // ❌ Conflict
+    'migrations' => ['enabled' => true], // ❌ Conflict
+],
+```
+
+**Symptoms**:
+- Database import errors
+- Duplicate table creation attempts
+- Migration failures
+- Inconsistent database state
+
+**Solution**:
+```php
+// GOOD - Choose ONE database method
+'import_options' => [
+    'dump_file' => ['enabled' => true],   // ✅ Use SQL dump
+    'migrations' => ['enabled' => false], // ❌ Disable migrations
+],
+
+// OR use migrations
+'import_options' => [
+    'dump_file' => ['enabled' => false],  // ❌ Disable dump
+    'migrations' => ['enabled' => true],  // ✅ Use migrations
+],
+```
+
+#### ❌ Problem: Wrong Database Method for Application Type
+
+**Scenario**: Using migrations for complex legacy database structures
+
+**Solution**: Choose the right method:
+- **Complex/Legacy databases** → SQL dump method
+- **Standard Laravel apps** → Migrations method
+
 #### ❌ Problem: Wrong Mode for Deployment Phase
 
 **Scenario**: Enabling installation wizard for an update deployment
@@ -443,8 +643,68 @@ php artisan tinker
 >>> config('launchpad.installation.enabled')
 >>> config('launchpad.update.enabled')
 
+# Check database configuration
+>>> config('launchpad.database.import_options.dump_file.enabled')
+>>> config('launchpad.database.import_options.migrations.enabled')
+
+# Verify both dump and migrations are not enabled
+>>> $dump = config('launchpad.database.import_options.dump_file.enabled');
+>>> $migrations = config('launchpad.database.import_options.migrations.enabled');
+>>> if ($dump && $migrations) echo "⚠️ CONFLICT: Both dump and migrations enabled!";
+
 # List available routes
 php artisan route:list | grep launchpad
+```
+
+### Database Configuration Validation
+
+**Quick Configuration Check Script**:
+
+```php
+// Create a simple validation script: check-config.php
+<?php
+
+require 'vendor/autoload.php';
+
+$app = require_once 'bootstrap/app.php';
+$app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
+
+// Check installation vs update conflict
+$installEnabled = config('launchpad.installation.enabled');
+$updateEnabled = config('launchpad.update.enabled');
+
+if ($installEnabled && $updateEnabled) {
+    echo "❌ CONFLICT: Both installation and update are enabled!\n";
+} else {
+    echo "✅ Installation/Update configuration is valid\n";
+}
+
+// Check database method conflict
+$dumpEnabled = config('launchpad.database.import_options.dump_file.enabled');
+$migrationsEnabled = config('launchpad.database.import_options.migrations.enabled');
+
+if ($dumpEnabled && $migrationsEnabled) {
+    echo "❌ CONFLICT: Both SQL dump and migrations are enabled!\n";
+    echo "   Choose one: either dump_file OR migrations\n";
+} else {
+    echo "✅ Database configuration is valid\n";
+    if ($dumpEnabled) {
+        $dumpPath = config('launchpad.database.import_options.dump_file.path');
+        if (file_exists($dumpPath)) {
+            echo "✅ SQL dump file found: {$dumpPath}\n";
+        } else {
+            echo "⚠️  SQL dump file not found: {$dumpPath}\n";
+        }
+    }
+    if ($migrationsEnabled) {
+        echo "✅ Using Laravel migrations\n";
+    }
+}
+```
+
+**Run the validation**:
+```bash
+php check-config.php
 ```
 
 ## 🧪 Testing
