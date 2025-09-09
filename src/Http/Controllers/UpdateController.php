@@ -119,6 +119,9 @@ class UpdateController extends Controller
     public function runUpdate(Request $request)
     {
         try {
+            // Clear config cache first to ensure fresh config reading
+            Artisan::call('config:clear');
+            
             $options = $request->get('update_options', []);
             $results = [];
 
@@ -145,14 +148,14 @@ class UpdateController extends Controller
                 }
             }
 
-            // Run post-update actions
-            $this->runPostUpdateActions();
-
-            // Update version file
+            // Update version file first
             $this->updateVersionFile();
 
-            // Disable update routes after successful completion
+            // Disable update routes BEFORE running post-update actions
             $this->disableUpdateRoutes();
+
+            // Run post-update actions (this may cache config, so routes should be disabled first)
+            $this->runPostUpdateActions();
 
             return response()->json([
                 'success' => true,
@@ -281,15 +284,11 @@ class UpdateController extends Controller
                 if ($updatedContent && $updatedContent !== $content) {
                     File::put($configPath, $updatedContent);
 
-                    // Clear config cache to ensure the new setting takes effect
-                    Artisan::call('config:clear');
-
-                    // Also set in runtime config
+                    // Set in runtime config immediately
                     Config::set('launchpad.update.enabled', false);
                 }
             }
         } catch (\Exception $e) {
-            // Log the error but don't fail the update process
             Log::warning('Failed to disable update routes: '.$e->getMessage());
         }
     }

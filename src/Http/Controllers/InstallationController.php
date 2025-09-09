@@ -265,14 +265,14 @@ class InstallationController extends Controller
                 Artisan::call('key:generate', ['--force' => true]);
             }
 
-            // Run post-installation actions
-            $this->runPostInstallActions();
-
             // Mark as installed ONLY after everything succeeds
             $this->installationService->markAsInstalled();
 
-            // Disable installation routes for security
+            // Disable installation routes BEFORE running post-install actions
             $this->disableInstallationRoutes();
+
+            // Run post-installation actions (this may cache config, so routes should be disabled first)
+            $this->runPostInstallActions();
 
             // Clear session data
             session()->forget(['database_config', 'admin_data', 'license_verified']);
@@ -466,42 +466,6 @@ class InstallationController extends Controller
         $userModel::create($userData);
     }
 
-    protected function createAdminUser()
-    {
-        $adminConfig = config('launchpad.admin');
-        if (! ($adminConfig['enabled'] ?? false)) {
-            return;
-        }
-
-        $adminData = session('admin_data', []);
-        $userModel = $adminConfig['model'] ?? 'App\\Models\\User';
-
-        if (! class_exists($userModel)) {
-            throw new \Exception("User model {$userModel} not found");
-        }
-
-        $userData = [];
-        foreach ($adminConfig['fields'] ?? [] as $field => $config) {
-            if (isset($adminData[$field])) {
-                $value = $adminData[$field];
-
-                if ($field === 'password') {
-                    $value = Hash::make($value);
-                }
-
-                $userData[$field] = $value;
-            }
-        }
-
-        // Add default data
-        $userData = array_merge($userData, $adminConfig['default_data'] ?? []);
-
-        // Remove password confirmation
-        unset($userData['password_confirmation']);
-
-        $userModel::create($userData);
-    }
-
     protected function runPostInstallActions()
     {
         $actions = config('launchpad.post_install.actions', []);
@@ -543,15 +507,11 @@ class InstallationController extends Controller
                 if ($updatedContent && $updatedContent !== $content) {
                     File::put($configPath, $updatedContent);
 
-                    // Clear config cache to ensure the new setting takes effect
-                    Artisan::call('config:clear');
-
-                    // Also set in runtime config
+                    // Set in runtime config immediately
                     Config::set('launchpad.installation.enabled', false);
                 }
             }
         } catch (\Exception $e) {
-            // Log the error but don't fail the installation process
             Log::warning('Failed to disable installation routes: '.$e->getMessage());
         }
     }

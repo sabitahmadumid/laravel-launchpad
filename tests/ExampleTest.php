@@ -1,5 +1,5 @@
 <?php
 
-it('can test', function () {
-    expect(true)->toBeTrue();
+it('can initialize launchpad service provider', function () {
+    expect(app('laravel-launchpad'))->not()->toBeNull();
 });

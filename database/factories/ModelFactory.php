@@ -1,19 +1,4 @@
 <?php
 
-namespace SabitAhmad\LaravelLaunchpad\Database\Factories;
-
-use Illuminate\Database\Eloquent\Factories\Factory;
-
-/*
-class ModelFactory extends Factory
-{
-    protected $model = YourModel::class;
-
-    public function definition()
-    {
-        return [
-
-        ];
-    }
-}
-*/
+// This file is intentionally left empty.
+// Add model factories here if needed for testing or development.

@@ -481,7 +481,6 @@ function databaseConfiguration() {
             }
             
             this.loading = true;
-            // Reset connection status before testing
             this.resetConnectionStatus();
             
             try {
@@ -495,9 +494,7 @@ function databaseConfiguration() {
                 });
                 
                 const data = await response.json();
-                console.log('Database test response:', data); // Debug log
                 
-                // Handle both success and validation error responses
                 if (response.ok && data.success) {
                     this.connectionSuccess = true;
                     this.connectionMessage = data.message || 'Database connection successful!';
@@ -522,9 +519,6 @@ function databaseConfiguration() {
             this.setupLoading = true;
             
             try {
-                // The setupDatabase endpoint handles both saving config to .env AND running migrations/seeders
-                // Database config is already stored in session from the connection test
-                
                 const automaticOptions = [];
                 
                 @if(isset($importOptions['migrations']) && ($importOptions['migrations']['enabled'] ?? false))
