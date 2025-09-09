@@ -7,10 +7,8 @@
 @section('progress')
     <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
-            <div class="flex items-center">
-                <div class="step-completed w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">✓</div>
-                <span class="ml-2 text-sm text-gray-500">Welcome</span>
-            </div>
+            <div class="step-completed w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">✓</div>
+            <span class="ml-2 text-sm text-gray-500">Welcome</span>
             <div class="flex-1 h-1 bg-green-200 mx-4"></div>
             <div class="flex items-center">
                 <div class="step-completed w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">✓</div>
@@ -199,7 +197,180 @@
                     <span>Testing Connection...</span>
                 </span>
             </button>
+
+            <!-- Database Setup Section - Only shown after successful connection test -->
+            <div x-show="connectionSuccess" x-cloak class="mt-8 pt-8 border-t border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Database Setup Required</h3>
+                <p class="text-gray-600 mb-6">
+                    Connection test successful! The following database setup steps will be performed automatically:
+                </p>
+
+                <div class="space-y-3 mb-6">
+                    @if(isset($importOptions['migrations']) && ($importOptions['migrations']['enabled'] ?? false))
+                    <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                        <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <div>
+                            <div class="text-sm font-medium text-gray-900">Database Migrations</div>
+                            <div class="text-sm text-gray-500">Create necessary database tables</div>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if(isset($importOptions['seeders']) && ($importOptions['seeders']['enabled'] ?? false))
+                    <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                        <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <div>
+                            <div class="text-sm font-medium text-gray-900">Database Seeders</div>
+                            <div class="text-sm text-gray-500">Populate tables with sample data</div>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if(isset($importOptions['dump_file']) && ($importOptions['dump_file']['enabled'] ?? false))
+                    <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                        <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <div>
+                            <div class="text-sm font-medium text-gray-900">Import SQL Dump</div>
+                            <div class="text-sm text-gray-500">Import database from {{ $importOptions['dump_file']['path'] ?? 'SQL file' }}</div>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if(
+                        (!isset($importOptions['migrations']) || !($importOptions['migrations']['enabled'] ?? false)) &&
+                        (!isset($importOptions['seeders']) || !($importOptions['seeders']['enabled'] ?? false)) &&
+                        (!isset($importOptions['dump_file']) || !($importOptions['dump_file']['enabled'] ?? false))
+                    )
+                    <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <svg class="h-5 w-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        <div>
+                            <div class="text-sm font-medium text-gray-900">No Database Setup Required</div>
+                            <div class="text-sm text-gray-500">Your configuration doesn't require any database setup steps</div>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+
+                <!-- Setup Progress -->
+                <div x-show="setupLoading" x-cloak class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <svg class="animate-spin h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <div>
+                            <h4 class="text-sm font-medium text-blue-800">Setting up Database...</h4>
+                            <p class="text-sm text-blue-700">Please wait while we configure your database. This may take a few minutes.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success Message -->
+                <div x-show="setupSuccess" x-cloak class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <div>
+                            <h4 class="text-sm font-medium text-green-800">Database Setup Complete!</h4>
+                            <p class="text-sm text-green-700">Your database has been configured successfully.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </form>
+
+        <!-- Database Setup Section -->
+        <div x-show="connectionSuccess" x-cloak class="mt-8">
+            <div class="bg-white border border-gray-200 rounded-lg p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Database Setup</h3>
+                        <p class="text-sm text-gray-600 mt-1">The following operations will be performed automatically:</p>
+                    </div>
+                </div>
+
+                <!-- Setup Options Display -->
+                <div class="space-y-3">
+                    @if(config('launchpad.import_options.run_migrations', true))
+                    <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-blue-800">Run Database Migrations</p>
+                            <p class="text-sm text-blue-600">Create necessary database tables and structure</p>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if(config('launchpad.import_options.run_seeders', false))
+                    <div class="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-green-800">Run Database Seeders</p>
+                            <p class="text-sm text-green-600">Populate database with sample data</p>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if(config('launchpad.import_options.import_dump', false))
+                    <div class="flex items-center space-x-3 p-3 bg-purple-50 rounded-lg">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-purple-800">Import Database Dump</p>
+                            <p class="text-sm text-purple-600">Import existing database dump file</p>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+                
+                <!-- Setup Progress -->
+                <div x-show="setupLoading" x-cloak class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <svg class="animate-spin h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 818-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <div>
+                            <h4 class="text-sm font-medium text-blue-800">Setting up Database...</h4>
+                            <p class="text-sm text-blue-700">Please wait while we configure your database. This may take a few minutes.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Setup Success -->
+                <div x-show="setupSuccess" x-cloak class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <div>
+                            <h4 class="text-sm font-medium text-green-800">Database Setup Complete!</h4>
+                            <p class="text-sm text-green-700">Your database has been successfully configured and set up.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Database Help -->
         <div class="mt-8 bg-gray-50 rounded-lg p-6">
@@ -233,7 +404,22 @@
                 ← Back
             </a>
             
-            <a x-show="connectionSuccess" 
+            <button x-show="connectionSuccess && !setupSuccess" 
+                   @click="handleContinue()"
+                   :disabled="setupLoading"
+                   class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                   x-cloak>
+                <span x-show="!setupLoading">Continue →</span>
+                <span x-show="setupLoading" x-cloak class="flex items-center space-x-2">
+                    <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Setting up...</span>
+                </span>
+            </button>
+            
+            <a x-show="setupSuccess" 
                href="{{ route('launchpad.install.admin') }}" 
                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
                x-cloak>
@@ -242,6 +428,7 @@
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script>
@@ -256,7 +443,9 @@ function databaseConfiguration() {
             password: ''
         },
         loading: false,
+        setupLoading: false,
         connectionSuccess: false,
+        setupSuccess: false,
         connectionMessage: '',
         
         getDefaultPort() {
@@ -282,6 +471,7 @@ function databaseConfiguration() {
         
         resetConnectionStatus() {
             this.connectionSuccess = false;
+            this.setupSuccess = false;
             this.connectionMessage = '';
         },
         
@@ -328,6 +518,62 @@ function databaseConfiguration() {
             }
         },
 
+        async handleContinue() {
+            this.setupLoading = true;
+            
+            try {
+                // The setupDatabase endpoint handles both saving config to .env AND running migrations/seeders
+                // Database config is already stored in session from the connection test
+                
+                const automaticOptions = [];
+                
+                @if(isset($importOptions['migrations']) && ($importOptions['migrations']['enabled'] ?? false))
+                automaticOptions.push('migrations');
+                @endif
+                
+                @if(isset($importOptions['seeders']) && ($importOptions['seeders']['enabled'] ?? false))
+                automaticOptions.push('seeders');
+                @endif
+                
+                @if(isset($importOptions['dump_file']) && ($importOptions['dump_file']['enabled'] ?? false))
+                automaticOptions.push('dump_file');
+                @endif
+                
+                const setupResponse = await fetch('{{ route("launchpad.install.database.setup") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        database_options: automaticOptions
+                    })
+                });
+                
+                const setupData = await setupResponse.json();
+                
+                if (!setupResponse.ok || !setupData.success) {
+                    this.showNotification(setupData.message || 'Database setup failed.', 'error');
+                    return;
+                }
+                
+                // Mark setup as successful
+                this.setupSuccess = true;
+                this.showNotification('Database configuration and setup completed successfully!', 'success');
+                
+                // Navigate to admin setup after a brief delay
+                setTimeout(() => {
+                    window.location.href = '{{ route("launchpad.install.admin") }}';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Database setup error:', error);
+                this.showNotification('Error during database setup. Please try again.', 'error');
+            } finally {
+                this.setupLoading = false;
+            }
+        },
+
         showNotification(message, type = 'info') {
             // Use global showNotification if available, otherwise create a simple fallback
             if (typeof window.showNotification === 'function') {
@@ -369,4 +615,3 @@ function databaseConfiguration() {
 }
 </script>
 @endpush
-@endsection

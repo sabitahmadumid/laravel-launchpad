@@ -12,52 +12,50 @@
                 </svg>
             </div>
             
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">Ready to Install!</h2>
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Complete Installation</h2>
             <p class="text-lg text-gray-600">
-                Almost done! Choose how to set up your database and complete the installation.
+                Great! Your database is configured and admin user is created. Click below to finalize the installation.
             </p>
         </div>
 
         <form @submit.prevent="completeInstallation()" class="max-w-2xl mx-auto space-y-6">
             
-            <!-- Database Setup Options -->
-            <div class="bg-gray-50 rounded-lg p-6">
+            <!-- Installation Summary -->
+            <div class="bg-green-50 rounded-lg p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <svg class="h-5 w-5 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                    <svg class="h-5 w-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                     </svg>
-                    Database Setup Options
+                    Installation Progress
                 </h3>
                 
-                <div class="space-y-4">
-                    @foreach($databaseOptions as $optionKey => $optionConfig)
-                        @if($optionConfig['enabled'] ?? false)
-                        <label class="flex items-start space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-white transition-colors duration-200">
-                            <input 
-                                type="checkbox" 
-                                x-model="selectedOptions"
-                                value="{{ $optionKey }}"
-                                class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            >
-                            <div class="flex-1">
-                                <div class="font-medium text-gray-900">{{ $optionConfig['description'] }}</div>
-                                @if(isset($optionConfig['path']))
-                                    <div class="text-sm text-gray-500 mt-1">
-                                        File: {{ $optionConfig['path'] }}
-                                    </div>
-                                @endif
-                            </div>
-                        </label>
-                        @endif
-                    @endforeach
-                </div>
-                
-                <div class="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                    <div class="flex items-start space-x-3">
-                        <svg class="h-5 w-5 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                <div class="space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
-                        <div>
+                        <span class="text-gray-700">System requirements checked</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="text-gray-700">License verified</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="text-gray-700">Database configured and set up</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="text-gray-700">Admin user created</span>
+                    </div>
+                </div>
+            </div>
                             <h4 class="text-sm font-medium text-amber-800">Important Notes:</h4>
                             <ul class="text-sm text-amber-700 mt-1 space-y-1">
                                 <li>• If you have existing data, choose carefully to avoid data loss</li>
@@ -150,14 +148,6 @@
                 🚀 Complete Installation
             </button>
         </form>
-
-        <!-- Actions -->
-        <div class="flex justify-between items-center pt-6 border-t mt-8" x-show="!installing">
-            <a href="{{ route('launchpad.install.admin') }}" 
-               class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200">
-                ← Back
-            </a>
-        </div>
     </div>
 </div>
 
@@ -165,12 +155,9 @@
 <script>
 function finalInstallation() {
     return {
-        selectedOptions: ['migrations', 'seeders'], // Default selections
         installing: false,
         installationSteps: {
             config: false,
-            database: false,
-            admin: false,
             finalize: false
         },
         errorMessage: '',
@@ -182,8 +169,6 @@ function finalInstallation() {
             // Reset progress
             this.installationSteps = {
                 config: false,
-                database: false,
-                admin: false,
                 finalize: false
             };
             
@@ -193,10 +178,7 @@ function finalInstallation() {
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        database_options: this.selectedOptions
-                    })
+                    }
                 });
                 
                 const data = await response.json();

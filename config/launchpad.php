@@ -7,7 +7,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'installation' => [
-        'enabled' => env('LAUNCHPAD_INSTALLATION_ENABLED', true),
+        'enabled' => false,
         'route_prefix' => 'install',
         'route_middleware' => ['web'],
         'completed_file' => storage_path('app/installed.lock'),
@@ -19,11 +19,11 @@ return [
     |--------------------------------------------------------------------------
     */
     'update' => [
-        'enabled' => env('LAUNCHPAD_UPDATE_ENABLED', true),
+        'enabled' => false,
         'route_prefix' => 'update',
         'route_middleware' => ['web'],
         'version_file' => storage_path('app/version.lock'),
-        'current_version' => env('APP_VERSION', '1.0.0'),
+        'current_version' => '1.0.0',
     ],
 
     /*
@@ -87,9 +87,9 @@ return [
     |--------------------------------------------------------------------------
     */
     'license' => [
-        'enabled' => env('LAUNCHPAD_LICENSE_ENABLED', true),
-        'validator_class' => env('LAUNCHPAD_LICENSE_VALIDATOR', 'App\\Services\\EnvatoLicenseChecker'),
-        'server_url' => env('LAUNCHPAD_LICENSE_SERVER_URL'),
+        'enabled' => true,
+        'validator_class' => 'App\\Services\\EnvatoLicenseChecker',
+        'server_url' => null,
         'timeout' => 30,
         'cache_duration' => 3600, // Cache license verification for 1 hour
     ],
@@ -126,7 +126,7 @@ return [
     */
     'admin' => [
         'enabled' => true,
-        'model' => env('LAUNCHPAD_USER_MODEL', 'App\\Models\\User'),
+        'model' => 'App\\Models\\User',
         'fields' => [
             'name' => [
                 'type' => 'text',
@@ -182,7 +182,7 @@ return [
                     'required' => true,
                     'validation' => 'required|url',
                     'env_key' => 'APP_URL',
-                    'default' => request()->getSchemeAndHttpHost(),
+                    'default' => 'http://localhost',
                 ],
                 'timezone' => [
                     'type' => 'select',
@@ -254,7 +254,7 @@ return [
             'route_cache' => false,
             'view_cache' => false,
         ],
-        'redirect_url' => env('LAUNCHPAD_POST_INSTALL_REDIRECT', '/admin'),
+        'redirect_url' => '/admin',
     ],
 
     /*

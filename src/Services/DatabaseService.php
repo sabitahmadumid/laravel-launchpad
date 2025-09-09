@@ -30,34 +30,66 @@ class DatabaseService
     public function updateEnvFile(array $config): void
     {
         $envFile = base_path('.env');
-        $envContent = File::get($envFile);
-
-        $replacements = [
-            'DB_CONNECTION' => $config['connection'],
-            'DB_HOST' => $config['host'],
-            'DB_PORT' => $config['port'],
-            'DB_DATABASE' => $config['database'],
-            'DB_USERNAME' => $config['username'],
-            'DB_PASSWORD' => $config['password'],
-        ];
-
-        foreach ($replacements as $key => $value) {
-            $pattern = "/^{$key}=.*/m";
-            $replacement = "{$key}=".(empty($value) ? '""' : $value);
-
-            if (preg_match($pattern, $envContent)) {
-                $envContent = preg_replace($pattern, $replacement, $envContent);
-            } else {
-                $envContent .= "\n{$replacement}";
-            }
+        
+        if (!file_exists($envFile)) {
+            throw new \Exception('.env file not found');
         }
 
-        File::put($envFile, $envContent);
+        // Create backup of .env file
+        $backupFile = $envFile . '.backup.' . time();
+        if (!copy($envFile, $backupFile)) {
+            throw new \Exception('Could not create .env backup file');
+        }
+
+        try {
+            $envContent = File::get($envFile);
+
+            $replacements = [
+                'DB_CONNECTION' => $config['connection'],
+                'DB_HOST' => $config['host'],
+                'DB_PORT' => $config['port'],
+                'DB_DATABASE' => $config['database'],
+                'DB_USERNAME' => $config['username'],
+                'DB_PASSWORD' => $config['password'],
+                // Set session driver to file during installation to prevent database dependency
+                'SESSION_DRIVER' => 'file',
+            ];
+
+            foreach ($replacements as $key => $value) {
+                $pattern = "/^{$key}=.*/m";
+                $replacement = "{$key}=".(empty($value) ? '""' : '"'.str_replace('"', '\"', $value).'"');
+
+                if (preg_match($pattern, $envContent)) {
+                    $envContent = preg_replace($pattern, $replacement, $envContent);
+                } else {
+                    $envContent .= "\n{$replacement}";
+                }
+            }
+
+            if (!File::put($envFile, $envContent)) {
+                throw new \Exception('Could not write to .env file');
+            }
+
+            // Clean up backup file if successful
+            @unlink($backupFile);
+
+        } catch (\Exception $e) {
+            // Restore backup on failure
+            if (file_exists($backupFile)) {
+                copy($backupFile, $envFile);
+                @unlink($backupFile);
+            }
+            throw new \Exception('Failed to update .env file: ' . $e->getMessage());
+        }
     }
 
     public function runMigrations(): array
     {
         try {
+            // Clear any cached config to ensure fresh database connection
+            Artisan::call('config:clear');
+            
+            // Run migrations with force flag
             Artisan::call('migrate', ['--force' => true]);
 
             return [
@@ -76,6 +108,10 @@ class DatabaseService
     public function runSeeders(): array
     {
         try {
+            // Ensure database connection is fresh
+            Artisan::call('config:clear');
+            
+            // Run seeders with force flag
             Artisan::call('db:seed', ['--force' => true]);
 
             return [

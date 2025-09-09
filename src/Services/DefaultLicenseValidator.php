@@ -10,10 +10,12 @@ use SabitAhmad\LaravelLaunchpad\Contracts\LicenseValidatorInterface;
 class DefaultLicenseValidator implements LicenseValidatorInterface
 {
     protected Client $httpClient;
+    protected InstallationService $installationService;
 
-    public function __construct(Client $httpClient)
+    public function __construct(Client $httpClient, InstallationService $installationService)
     {
         $this->httpClient = $httpClient;
+        $this->installationService = $installationService;
     }
 
     public function validate(string $licenseKey, array $additionalData = []): array
@@ -25,12 +27,23 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
             ];
         }
 
+        // During installation, skip caching to avoid database dependency
+        if (!$this->installationService->isInstalled()) {
+            return $this->performValidation($licenseKey, $additionalData);
+        }
+
+        // Use cache only after installation is complete
         $cacheKey = 'launchpad_license_'.md5($licenseKey);
         $cacheDuration = config('launchpad.license.cache_duration', 3600);
 
-        return Cache::remember($cacheKey, $cacheDuration, function () use ($licenseKey, $additionalData) {
+        try {
+            return Cache::remember($cacheKey, $cacheDuration, function () use ($licenseKey, $additionalData) {
+                return $this->performValidation($licenseKey, $additionalData);
+            });
+        } catch (\Exception $e) {
+            // If cache fails (e.g., database not ready), fall back to direct validation
             return $this->performValidation($licenseKey, $additionalData);
-        });
+        }
     }
 
     protected function performValidation(string $licenseKey, array $additionalData): array
@@ -49,8 +62,8 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
                 'timeout' => config('launchpad.license.timeout', 30),
                 'json' => array_merge([
                     'license_key' => $licenseKey,
-                    'domain' => request()->getHost(),
-                    'ip' => request()->ip(),
+                    'domain' => request() ? request()->getHost() : parse_url(config('app.url', 'localhost'), PHP_URL_HOST),
+                    'ip' => request() ? request()->ip() : '127.0.0.1',
                 ], $additionalData),
             ]);
 

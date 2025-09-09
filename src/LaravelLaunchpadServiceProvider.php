@@ -5,6 +5,7 @@ namespace SabitAhmad\LaravelLaunchpad;
 use SabitAhmad\LaravelLaunchpad\Commands\LaravelLaunchpadCommand;
 use SabitAhmad\LaravelLaunchpad\Commands\PublishLicenseStubCommand;
 use SabitAhmad\LaravelLaunchpad\Http\Middleware\CheckInstallation;
+use SabitAhmad\LaravelLaunchpad\Http\Middleware\CheckLicense;
 use SabitAhmad\LaravelLaunchpad\Http\Middleware\RedirectIfInstalled;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -22,7 +23,6 @@ class LaravelLaunchpadServiceProvider extends PackageServiceProvider
             ->name('laravel-launchpad')
             ->hasConfigFile('launchpad')
             ->hasViews()
-            ->hasRoute('web')
             ->hasMigration('create_launchpad_table')
             ->hasCommands([
                 LaravelLaunchpadCommand::class,
@@ -32,11 +32,15 @@ class LaravelLaunchpadServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
-        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        // Only load routes conditionally based on configuration
+        $this->loadConditionalRoutes();
 
         // Register middleware
         $this->app['router']->aliasMiddleware('check.installation', CheckInstallation::class);
         $this->app['router']->aliasMiddleware('redirect.if.installed', RedirectIfInstalled::class);
+        $this->app['router']->aliasMiddleware('check.license', CheckLicense::class);
+        $this->app['router']->aliasMiddleware('ensure.file.session', \SabitAhmad\LaravelLaunchpad\Http\Middleware\EnsureFileSession::class);
+        $this->app['router']->aliasMiddleware('ensure.file.cache', \SabitAhmad\LaravelLaunchpad\Http\Middleware\EnsureFileCache::class);
 
         // Explicitly publish config file with tag
         if ($this->app->runningInConsole()) {
@@ -56,6 +60,19 @@ class LaravelLaunchpadServiceProvider extends PackageServiceProvider
             $this->publishes([
                 __DIR__.'/../resources/views' => resource_path('views/vendor/launchpad'),
             ], 'views');
+        }
+    }
+
+    /**
+     * Load routes conditionally based on configuration
+     */
+    protected function loadConditionalRoutes(): void
+    {
+        $installationEnabled = config('launchpad.installation.enabled', false);
+        $updateEnabled = config('launchpad.update.enabled', false);
+
+        if ($installationEnabled || $updateEnabled) {
+            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         }
     }
 

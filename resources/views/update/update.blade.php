@@ -14,7 +14,7 @@
             
             <h2 class="text-3xl font-bold text-gray-900 mb-4">Apply Update</h2>
             <p class="text-lg text-gray-600">
-                Choose update options and apply the update to version {{ $newVersion }}.
+                The update will automatically apply all configured options and update to version {{ $newVersion }}.
             </p>
         </div>
 
@@ -41,19 +41,18 @@
                     <svg class="h-5 w-5 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
                     </svg>
-                    Update Options
+                    Update Configuration
                 </h3>
                 
                 <div class="space-y-4">
                     @foreach($updateOptions as $optionKey => $optionConfig)
                         @if($optionConfig['enabled'] ?? false)
-                        <label class="flex items-start space-x-3 p-4 border rounded-lg cursor-pointer hover:bg-white transition-colors duration-200">
-                            <input 
-                                type="checkbox" 
-                                x-model="selectedOptions"
-                                value="{{ $optionKey }}"
-                                class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            >
+                        <div class="flex items-start space-x-3 p-4 border rounded-lg bg-white">
+                            <div class="flex-shrink-0 mt-1">
+                                <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
                             <div class="flex-1">
                                 <div class="font-medium text-gray-900">{{ $optionConfig['description'] }}</div>
                                 @if(isset($optionConfig['path']))
@@ -61,8 +60,9 @@
                                         File: {{ $optionConfig['path'] }}
                                     </div>
                                 @endif
+                                <div class="text-sm text-green-600 mt-1">✓ Automatically included</div>
                             </div>
-                        </label>
+                        </div>
                         @endif
                     @endforeach
                 </div>
@@ -77,7 +77,8 @@
                             <ul class="text-sm text-amber-700 mt-1 space-y-1">
                                 <li>• Always backup your data before running updates</li>
                                 <li>• Do not close this browser tab during the update</li>
-                                <li>• The update process may take several minutes</li>
+                                <li>• The update will automatically run all configured options</li>
+                                <li>• Update routes will be disabled after successful completion</li>
                             </ul>
                         </div>
                     </div>
@@ -151,7 +152,7 @@
                 class="w-full bg-orange-600 text-white py-4 px-6 rounded-lg font-medium text-lg hover:bg-orange-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 x-show="!updating"
             >
-                🚀 Run Update
+                🚀 Start Automatic Update
             </button>
         </form>
 
@@ -169,7 +170,7 @@
 <script>
 function updateRunner() {
     return {
-        selectedOptions: ['migrations'], // Default selections
+        selectedOptions: {!! json_encode(array_keys(array_filter($updateOptions, function($option) { return $option['enabled'] ?? false; }))) !!}, // Automatically select all enabled options
         updating: false,
         updateSteps: {
             database: false,

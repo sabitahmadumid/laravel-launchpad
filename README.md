@@ -5,21 +5,22 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/sabitahmadumid/laravel-launchpad/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/sabitahmadumid/laravel-launchpad/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/sabitahmadumid/laravel-launchpad.svg?style=flat-square)](https://packagist.org/packages/sabitahmadumid/laravel-launchpad)
 
-**Laravel Launchpad** is a comprehensive installation and update wizard package that makes it incredibly easy for developers to ship their Laravel applications and for end-users to install them. With professional UI components, license validation, environment checking, and a streamlined 3-step process, Launchpad transforms complex deployments into simple, guided experiences.
+**Laravel Launchpad** is a comprehensive installation and update wizard package that makes it incredibly easy for developers to ship their Laravel applications and for end-users to install them. With professional UI components, license validation, environment checking, and a streamlined automatic process, Launchpad transforms complex deployments into simple, guided experiences.
 
 Perfect for SaaS applications, commercial Laravel products, or any Laravel application that needs professional installation and update capabilities.
 
 ## ✨ Features
 
-- **🎯 Installation Wizard** - 5-step guided installation process for fresh deployments
-- **🔄 Update Wizard** - 5-step guided update process for version upgrades  
+- **🎯 Automatic Installation Wizard** - 5-step guided installation process with automatic configuration-based setup
+- **🔄 Automatic Update Wizard** - 5-step guided update process with automatic version upgrades  
 - **⚠️ Mutually Exclusive Modes** - Installation and update wizards are designed to run independently (never simultaneously)
+- **🤖 Configuration-Driven Flow** - No user choices required - all operations automatic based on configuration
+- **🔒 Auto-Security** - Installation/update routes automatically disabled after successful completion
 - **🛡️ License Validation** - Flexible license verification system with external server support
 - **⚙️ Environment Checking** - PHP version, extensions, and directory permissions validation
 - **🎨 Professional UI** - Modern, responsive interface built with Tailwind CSS and Alpine.js
-- **🔧 Highly Configurable** - Customize every aspect through configuration files
+- **🔧 Self-Contained Configuration** - All settings managed in config files, minimal environment dependencies
 - **🏗️ Clean Architecture** - Service-oriented design with proper separation of concerns
-- **🔒 Security First** - Middleware protection and secure installation tracking
 - **📱 Mobile Responsive** - Works perfectly on all devices and screen sizes
 - **🎉 User Experience** - Smooth animations, progress indicators, and celebration effects
 
@@ -51,94 +52,154 @@ php artisan vendor:publish --tag="laravel-launchpad-views"
 
 ## ⚙️ Configuration
 
-The package comes with a comprehensive configuration file located at `config/launchpad.php`. Here are the key configuration options:
+The package comes with a comprehensive configuration file located at `config/launchpad.php`. **All Launchpad settings are managed directly in the configuration file** (no environment file dependencies except for `app_name`), providing better version control and easier deployment management.
 
 ### Basic Settings
 
 ```php
 return [
-    'ui' => [
-        'app_name' => 'Your App Name',
-        'app_url' => env('APP_URL', 'http://localhost'),
-        'admin_route' => '/admin',
-        'logo_url' => null, // Optional logo URL
+    'installation' => [
+        'enabled' => false, // Set to true for new installations
+        'route_prefix' => 'install',
+        'route_middleware' => ['web'],
+        'completed_file' => storage_path('app/installed.lock'),
     ],
     
-    'requirements' => [
-        'php_version' => '8.1.0',
-        'extensions' => [
-            'openssl',
-            'pdo',
-            'mbstring',
-            'tokenizer',
-            'xml',
-            'ctype',
-            'json',
-            'bcmath',
-            'curl',
-            'gd',
-            'zip',
-        ],
-        'directories' => [
-            'storage/app' => 0755,
-            'storage/framework' => 0755,
-            'storage/logs' => 0755,
-            'bootstrap/cache' => 0755,
-        ],
+    'update' => [
+        'enabled' => false, // Set to true for updates
+        'route_prefix' => 'update',
+        'route_middleware' => ['web'],
+        'version_file' => storage_path('app/version.lock'),
+        'current_version' => '1.0.0', // Update this for new versions
     ],
     
     'license' => [
         'enabled' => true,
-        'validation_url' => 'https://your-license-server.com/validate',
+        'validator_class' => 'App\\Services\\EnvatoLicenseChecker',
+        'server_url' => null, // Set your license server URL
         'timeout' => 30,
-        'allow_local' => env('APP_ENV') === 'local',
     ],
     
-    'database' => [
-        'supported_drivers' => ['mysql', 'pgsql', 'sqlite'],
-        'test_connection' => true,
-        'default_charset' => 'utf8mb4',
-        'default_collation' => 'utf8mb4_unicode_ci',
-        'import_options' => [
-            // ⚠️ IMPORTANT: Choose ONE database setup method
-            'dump_file' => [
-                'enabled' => true,  // ✅ Use SQL dump import
-                'path' => database_path('dump.sql'),
-                'description' => 'Import initial database dump',
+    'ui' => [
+        'app_name' => env('APP_NAME', 'Laravel Application'), // Only env dependency
+        'logo_url' => null, // Optional logo URL
+        'primary_color' => '#3B82F6',
+    ],
+    
+    'requirements' => [
+        'php' => [
+            'min_version' => '8.0.0',
+            'recommended_version' => '8.2.0',
+        ],
+        'extensions' => [
+            'required' => [
+                'openssl', 'pdo', 'mbstring', 'tokenizer', 'xml',
+                'ctype', 'json', 'bcmath', 'curl', 'fileinfo', 'zip',
             ],
-            'migrations' => [
-                'enabled' => false, // ❌ Disable when using dump
-                'description' => 'Run database migrations',
-            ],
-            'seeders' => [
-                'enabled' => true,  // Optional: Can be used with either method
-                'description' => 'Run database seeders',
+            'recommended' => ['gd', 'imagick', 'redis', 'memcached'],
+        ],
+        'directories' => [
+            'writable' => [
+                'storage', 'storage/app', 'storage/framework',
+                'storage/logs', 'bootstrap/cache',
             ],
         ],
     ],
     
-    'admin_fields' => [
-        [
-            'name' => 'name',
-            'label' => 'Full Name',
-            'type' => 'text',
-            'required' => true,
+    'importOptions' => [
+        // Database setup configuration (choose one method)
+        'dump_file' => [
+            'enabled' => true,  // ✅ Use SQL dump import (recommended for complex apps)
+            'path' => database_path('dump.sql'),
+            'description' => 'Import initial database dump',
         ],
-        [
-            'name' => 'email',
-            'label' => 'Email Address',
-            'type' => 'email',
-            'required' => true,
+        'migrations' => [
+            'enabled' => false, // ❌ Disable when using dump (mutually exclusive)
+            'description' => 'Run database migrations',
         ],
-        [
-            'name' => 'password',
-            'label' => 'Password',
-            'type' => 'password',
-            'required' => true,
+        'seeders' => [
+            'enabled' => true,  // ✅ Optional: Can be used with either method
+            'description' => 'Run database seeders',
+        ],
+    ],
+    
+    'update_options' => [
+        // Update process configuration (choose one method)
+        'dump_file' => [
+            'enabled' => true,
+            'path' => database_path('updates/update.sql'),
+            'description' => 'Import update database dump',
+        ],
+        'migrations' => [
+            'enabled' => false, // ❌ Disable when using dump 
+            'description' => 'Run update migrations',
+        ],
+        'cache_clear' => true,  // Automatically clear cache after updates
+        'config_cache' => true, // Automatically cache config after updates
+    ],
+    
+    'admin' => [
+        'enabled' => true,
+        'model' => 'App\\Models\\User',
+        'fields' => [
+            'name' => [
+                'type' => 'text',
+                'label' => 'Full Name',
+                'required' => true,
+                'validation' => 'required|string|max:255',
+            ],
+            'email' => [
+                'type' => 'email',
+                'label' => 'Email Address', 
+                'required' => true,
+                'validation' => 'required|email|unique:users,email',
+            ],
+            'password' => [
+                'type' => 'password',
+                'label' => 'Password',
+                'required' => true,
+                'validation' => 'required|min:8|confirmed',
+            ],
+        ],
+    ],
+    
+    'post_install' => [
+        'redirect_url' => '/admin',
+        'actions' => [
+            'generate_app_key' => true,
+            'optimize_clear' => true,
+            'config_cache' => true,
+            'route_cache' => false,
+            'view_cache' => false,
         ],
     ],
 ];
 ```
+
+### 🔑 Key Configuration Changes
+
+**Self-Contained Configuration**: All Launchpad-specific settings are stored directly in the config file rather than environment variables, making deployment and version control easier.
+
+**Environment Dependencies Removed**: 
+- `installation.enabled` - Set directly in config (no `LAUNCHPAD_INSTALLATION_ENABLED`)
+- `update.enabled` - Set directly in config (no `LAUNCHPAD_UPDATE_ENABLED`)  
+- `update.current_version` - Set directly in config (no `APP_VERSION` dependency)
+- `license.enabled` - Set directly in config (no `LAUNCHPAD_LICENSE_ENABLED`)
+- All other Launchpad settings use direct values
+
+**Only APP_NAME Uses Environment**: 
+```php
+'app_name' => env('APP_NAME', 'Laravel Application'), // Only env dependency kept
+```
+
+### Automatic Operation Flow
+
+**All operations are now automatic based on configuration** - users don't make choices during installation/update:
+
+- **Database Setup**: Automatically runs all enabled options from `importOptions`
+- **Update Process**: Automatically runs all enabled options from `update_options`  
+- **Route Security**: Installation/update routes automatically disabled after completion
+- **No User Checkboxes**: Configuration determines what operations run
 
 ### Dynamic Fields
 
@@ -317,6 +378,16 @@ For updates, you can also choose between SQL dumps or migrations:
 > - **Installation Mode**: For fresh deployments (new installs)
 > - **Update Mode**: For existing installations (version updates)
 
+### 🤖 Automatic Operation Flow
+
+**All installation and update operations are now completely automatic** - no user choices or checkboxes! The system automatically:
+
+- ✅ **Runs all enabled operations** from configuration
+- ✅ **Disables routes after completion** for security
+- ✅ **Updates config files directly** (no env dependencies)
+- ✅ **Provides clear progress feedback** to users
+- ✅ **Handles errors gracefully** with proper messaging
+
 ### Installation Mode (For New Deployments)
 
 **When to use**: Deploying your Laravel application for the first time to end users.
@@ -330,26 +401,33 @@ For updates, you can also choose between SQL dumps or migrations:
 'update' => [
     'enabled' => false, // ❌ Disable update wizard
 ],
+
+// Configure automatic database setup
+'importOptions' => [
+    'dump_file' => ['enabled' => true, 'path' => database_path('dump.sql')],
+    'migrations' => ['enabled' => false], // Choose one method
+    'seeders' => ['enabled' => true],
+],
 ```
 
 **Setup Steps**:
-1. **Configure Settings** - Customize `config/launchpad.php` for installation
+1. **Configure Settings** - Set operations in `config/launchpad.php`
 2. **Set License Validation** - Configure your license server (optional)
 3. **Deploy Application** - Upload files WITHOUT running migrations
 4. **Share Install URL** - Provide users with `https://yourapp.com/install`
 
-**Installation Flow** - Users complete these steps:
+**Installation Flow** - Users experience this automatic process:
 
 ```
 https://yourapp.com/install
 ```
 
-1. **Welcome & Overview** - Introduction to the installation process
+1. **Welcome & Overview** - Introduction to the automatic installation process
 2. **Environment Check** - Validates PHP version, extensions, and permissions
 3. **License Validation** - Verifies license key (if enabled)
-4. **Database Setup** - Tests and configures database connection
+4. **Database Setup** - **AUTOMATIC**: Runs all configured database operations
 5. **Admin Creation** - Creates the administrator account
-6. **Success** - Installation completion with admin panel access
+6. **Success** - Installation completion + **routes automatically disabled**
 
 ### Update Mode (For Existing Installations)
 
@@ -365,6 +443,14 @@ https://yourapp.com/install
     'enabled' => true,  // ✅ Enable update wizard
     'current_version' => '2.0.0', // Your new version
 ],
+
+// Configure automatic update operations
+'update_options' => [
+    'dump_file' => ['enabled' => true, 'path' => database_path('updates/update.sql')],
+    'migrations' => ['enabled' => false], // Choose one method
+    'cache_clear' => true,
+    'config_cache' => true,
+],
 ```
 
 **Setup Steps**:
@@ -373,7 +459,7 @@ https://yourapp.com/install
 3. **Update Version** - Set `current_version` in config
 4. **Share Update URL** - Provide users with `https://yourapp.com/update`
 
-**Update Flow** - Users complete these steps:
+**Update Flow** - Users experience this automatic process:
 
 ```
 https://yourapp.com/update
@@ -382,8 +468,8 @@ https://yourapp.com/update
 1. **Update Overview** - Shows current and target versions
 2. **Environment Check** - Ensures environment compatibility
 3. **License Verification** - Validates license for updates
-4. **Update Process** - Performs file updates, migrations, and optimizations
-5. **Success** - Update completion with celebration
+4. **Update Process** - **AUTOMATIC**: Runs all configured update operations
+5. **Success** - Update completion + **routes automatically disabled**
 
 ### Deployment Workflow Examples
 
@@ -411,20 +497,30 @@ https://yourapp.com/update
 'update' => ['enabled' => true],        // ❌ BAD
 ```
 
-### Environment Variables
+### Configuration Management
 
-Control modes via environment variables:
+**Self-Contained Approach**: All settings are managed directly in the config file for better version control and deployment:
 
-```env
-# For installation mode
-LAUNCHPAD_INSTALLATION_ENABLED=true
-LAUNCHPAD_UPDATE_ENABLED=false
-
-# For update mode  
-LAUNCHPAD_INSTALLATION_ENABLED=false
-LAUNCHPAD_UPDATE_ENABLED=true
-APP_VERSION=1.1.0
+```php
+// config/launchpad.php - Direct configuration management
+'installation' => ['enabled' => true],  // No env dependency
+'update' => ['enabled' => false],       // No env dependency
+'license' => ['enabled' => true],       // No env dependency
+'update' => ['current_version' => '1.1.0'], // No env dependency
 ```
+
+**Only APP_NAME uses environment**:
+```php
+'ui' => [
+    'app_name' => env('APP_NAME', 'Laravel Application'), // Only env dependency
+],
+```
+
+**Automatic Route Security**: After successful installation/update completion:
+- Installation routes automatically disabled (`installation.enabled` → `false`)
+- Update routes automatically disabled (`update.enabled` → `false`)
+- Config file updated and cached automatically
+- No manual intervention required
 
 ### Middleware Protection
 
@@ -553,7 +649,7 @@ The package includes several security measures:
 #### ❌ Problem: Both SQL Dump and Migrations Enabled
 ```php
 // BAD - Will cause database conflicts!
-'import_options' => [
+'importOptions' => [
     'dump_file' => ['enabled' => true],   // ❌ Conflict
     'migrations' => ['enabled' => true], // ❌ Conflict
 ],
@@ -568,16 +664,46 @@ The package includes several security measures:
 **Solution**:
 ```php
 // GOOD - Choose ONE database method
-'import_options' => [
+'importOptions' => [
     'dump_file' => ['enabled' => true],   // ✅ Use SQL dump
     'migrations' => ['enabled' => false], // ❌ Disable migrations
 ],
 
 // OR use migrations
-'import_options' => [
+'importOptions' => [
     'dump_file' => ['enabled' => false],  // ❌ Disable dump
     'migrations' => ['enabled' => true],  // ✅ Use migrations
 ],
+```
+
+#### ❌ Problem: Routes Not Automatically Disabled
+
+**Symptoms**: Installation/update routes still accessible after completion
+
+**Check**:
+1. Config file permissions are writable
+2. Config cache has been cleared
+3. No syntax errors in config file
+
+**Solution**:
+```bash
+# Manually disable if automatic didn't work
+php artisan config:clear
+# Then edit config/launchpad.php manually:
+'installation' => ['enabled' => false],
+'update' => ['enabled' => false],
+```
+
+#### ❌ Problem: Config Changes Not Taking Effect
+
+**Symptoms**: Old configuration still being used
+
+**Solution**:
+```bash
+# Clear all caches
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
 ```
 
 #### ❌ Problem: Wrong Database Method for Application Type
@@ -609,7 +735,7 @@ The package includes several security measures:
 
 #### Switching from Installation to Update Mode
 
-After successful initial deployment:
+After successful initial deployment, update your configuration:
 
 ```php
 // config/launchpad.php - Change from:
@@ -621,13 +747,32 @@ After successful initial deployment:
 'update' => ['enabled' => true, 'current_version' => '1.1.0'],
 ```
 
-#### Environment Variable Method
+**Note**: Routes are automatically disabled after successful completion, so manual switching is primarily for new deployments.
 
-```env
-# .env - Switch modes without code changes
-LAUNCHPAD_INSTALLATION_ENABLED=false
-LAUNCHPAD_UPDATE_ENABLED=true
-APP_VERSION=1.1.0
+#### Deployment Workflow
+
+**For New Version Releases**:
+1. Update `config/launchpad.php` in your codebase
+2. Set `update.enabled = true` and `installation.enabled = false`  
+3. Update `update.current_version` to new version
+4. Deploy files to server
+5. Share update URL with users
+6. Routes automatically disable after successful updates
+
+**Configuration Template for Updates**:
+```php
+// config/launchpad.php - Update release template
+'installation' => ['enabled' => false], // Always false for updates
+'update' => [
+    'enabled' => true,
+    'current_version' => '2.0.0', // ← Update this
+],
+'update_options' => [
+    'dump_file' => ['enabled' => true], // Your update method
+    'migrations' => ['enabled' => false],
+    'cache_clear' => true,
+    'config_cache' => true,
+],
 ```
 
 ### Validation Commands
@@ -639,18 +784,24 @@ Check your current configuration:
 php artisan tinker
 >>> app(\SabitAhmad\LaravelLaunchpad\Services\InstallationService::class)->isInstalled()
 
-# Verify configuration
+# Verify configuration (new config-based approach)
 >>> config('launchpad.installation.enabled')
 >>> config('launchpad.update.enabled')
 
 # Check database configuration
->>> config('launchpad.database.import_options.dump_file.enabled')
->>> config('launchpad.database.import_options.migrations.enabled')
+>>> config('launchpad.importOptions.dump_file.enabled')
+>>> config('launchpad.importOptions.migrations.enabled')
+>>> config('launchpad.update_options.dump_file.enabled')
+>>> config('launchpad.update_options.migrations.enabled')
 
-# Verify both dump and migrations are not enabled
->>> $dump = config('launchpad.database.import_options.dump_file.enabled');
->>> $migrations = config('launchpad.database.import_options.migrations.enabled');
->>> if ($dump && $migrations) echo "⚠️ CONFLICT: Both dump and migrations enabled!";
+# Verify both dump and migrations are not enabled (mutual exclusion)
+>>> $dumpInstall = config('launchpad.importOptions.dump_file.enabled');
+>>> $migrationsInstall = config('launchpad.importOptions.migrations.enabled');
+>>> if ($dumpInstall && $migrationsInstall) echo "⚠️ CONFLICT: Both dump and migrations enabled for installation!";
+
+>>> $dumpUpdate = config('launchpad.update_options.dump_file.enabled');
+>>> $migrationsUpdate = config('launchpad.update_options.migrations.enabled');
+>>> if ($dumpUpdate && $migrationsUpdate) echo "⚠️ CONFLICT: Both dump and migrations enabled for updates!";
 
 # List available routes
 php artisan route:list | grep launchpad
@@ -677,35 +828,104 @@ if ($installEnabled && $updateEnabled) {
     echo "❌ CONFLICT: Both installation and update are enabled!\n";
 } else {
     echo "✅ Installation/Update configuration is valid\n";
+    if ($installEnabled) echo "   → Installation mode active\n";
+    if ($updateEnabled) echo "   → Update mode active\n";
 }
 
-// Check database method conflict
-$dumpEnabled = config('launchpad.database.import_options.dump_file.enabled');
-$migrationsEnabled = config('launchpad.database.import_options.migrations.enabled');
+// Check database method conflicts for installation
+$dumpEnabled = config('launchpad.importOptions.dump_file.enabled');
+$migrationsEnabled = config('launchpad.importOptions.migrations.enabled');
 
 if ($dumpEnabled && $migrationsEnabled) {
-    echo "❌ CONFLICT: Both SQL dump and migrations are enabled!\n";
-    echo "   Choose one: either dump_file OR migrations\n";
+    echo "❌ CONFLICT: Both SQL dump and migrations enabled for installation!\n";
+    echo "   Choose one: either dump_file OR migrations in importOptions\n";
 } else {
-    echo "✅ Database configuration is valid\n";
+    echo "✅ Installation database configuration is valid\n";
     if ($dumpEnabled) {
-        $dumpPath = config('launchpad.database.import_options.dump_file.path');
+        $dumpPath = config('launchpad.importOptions.dump_file.path');
         if (file_exists($dumpPath)) {
-            echo "✅ SQL dump file found: {$dumpPath}\n";
+            echo "✅ Installation SQL dump file found: {$dumpPath}\n";
         } else {
-            echo "⚠️  SQL dump file not found: {$dumpPath}\n";
+            echo "⚠️  Installation SQL dump file not found: {$dumpPath}\n";
         }
     }
     if ($migrationsEnabled) {
-        echo "✅ Using Laravel migrations\n";
+        echo "✅ Using Laravel migrations for installation\n";
     }
 }
+
+// Check database method conflicts for updates
+$updateDumpEnabled = config('launchpad.update_options.dump_file.enabled');
+$updateMigrationsEnabled = config('launchpad.update_options.migrations.enabled');
+
+if ($updateDumpEnabled && $updateMigrationsEnabled) {
+    echo "❌ CONFLICT: Both SQL dump and migrations enabled for updates!\n";
+    echo "   Choose one: either dump_file OR migrations in update_options\n";
+} else {
+    echo "✅ Update database configuration is valid\n";
+    if ($updateDumpEnabled) {
+        $updateDumpPath = config('launchpad.update_options.dump_file.path');
+        if (file_exists($updateDumpPath)) {
+            echo "✅ Update SQL dump file found: {$updateDumpPath}\n";
+        } else {
+            echo "⚠️  Update SQL dump file not found: {$updateDumpPath}\n";
+        }
+    }
+    if ($updateMigrationsEnabled) {
+        echo "✅ Using Laravel migrations for updates\n";
+    }
+}
+
+// Check automatic security
+echo "\n🔒 Automatic Security Features:\n";
+echo "   → Routes automatically disabled after successful completion\n";
+echo "   → Config file updated directly (no env dependencies)\n";
+echo "   → All operations automatic based on configuration\n";
 ```
 
 **Run the validation**:
 ```bash
 php check-config.php
 ```
+
+## 🎉 Version 2.0 Key Improvements
+
+### 🤖 Fully Automatic Operation Flow
+
+**Before**: Users had to choose what database operations to run via checkboxes
+**Now**: All operations are automatic based on configuration - zero user decisions required
+
+- ✅ **No User Checkboxes**: Configuration determines all operations
+- ✅ **Streamlined Flow**: "Start Automatic Installation/Update" buttons
+- ✅ **Consistent Experience**: Same flow every time based on your config
+- ✅ **Error-Free**: No risk of users choosing wrong options
+
+### 🔒 Enhanced Security & Management
+
+**Before**: Routes remained active after installation/update completion
+**Now**: Automatic route disabling and config-based management
+
+- ✅ **Auto-Disable Routes**: Installation/update routes disabled after completion
+- ✅ **Config File Management**: Direct config file updates instead of env dependencies
+- ✅ **Self-Contained**: All settings in version-controlled config files
+- ✅ **Runtime Updates**: Both file and memory config updated simultaneously
+
+### ⚙️ Simplified Configuration
+
+**Before**: Heavy reliance on environment variables
+**Now**: Direct config file management with minimal env dependencies
+
+- ✅ **Single Source of Truth**: All settings in `config/launchpad.php`
+- ✅ **Version Control Friendly**: Config changes tracked in git
+- ✅ **Deployment Friendly**: No env file manipulation required
+- ✅ **Only APP_NAME env dependency**: Everything else config-based
+
+### 🚀 Developer Experience Improvements
+
+- ✅ **Automatic Mode Switching**: Routes disable themselves after completion
+- ✅ **Clear Progress Indicators**: Users see exactly what's happening
+- ✅ **Better Error Handling**: Graceful failures with helpful messages  
+- ✅ **Simpler Deployment**: Update config, deploy files, share URL
 
 ## 🧪 Testing
 

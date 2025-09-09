@@ -28,6 +28,15 @@ class InstallationService
         ]));
     }
 
+    public function resetInstallation(): void
+    {
+        $completedFile = config('launchpad.installation.completed_file');
+        
+        if (File::exists($completedFile)) {
+            File::delete($completedFile);
+        }
+    }
+
     public function getInstallationData(): ?array
     {
         $completedFile = config('launchpad.installation.completed_file');
