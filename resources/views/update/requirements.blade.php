@@ -138,6 +138,7 @@
         @endif
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script>
@@ -197,4 +198,3 @@ function updateRequirementsChecker() {
 }
 </script>
 @endpush
-@endsection

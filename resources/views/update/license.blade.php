@@ -96,6 +96,7 @@
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script>
@@ -169,4 +170,3 @@ function updateLicenseVerifier() {
 }
 </script>
 @endpush
-@endsection

@@ -165,6 +165,7 @@
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script>
@@ -250,4 +251,3 @@ function updateRunner() {
 }
 </script>
 @endpush
-@endsection
