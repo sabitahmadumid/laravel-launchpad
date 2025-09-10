@@ -23,7 +23,7 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
     {
         // NO CONFIG-BASED BYPASSES ALLOWED - Use LicenseService::isLicenseRequired() instead
         // This validator only performs the actual license validation
-        
+
         // During installation, skip caching to avoid database dependency
         if (! $this->installationService->isInstalled()) {
             return $this->performValidation($licenseKey, $additionalData);
