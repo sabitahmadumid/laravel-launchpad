@@ -64,9 +64,15 @@ Optionally, publish the views for customization:
 php artisan vendor:publish --tag="laravel-launchpad-views"
 ```
 
+**Environment Setup**: Add your license key to your project's `.env` file:
+
+```bash
+LAUNCHPAD_LICENSE_KEY=your-license-key-here
+```
+
 ## ⚙️ Configuration
 
-The package comes with a comprehensive configuration file located at `config/launchpad.php`. **All Launchpad settings are managed directly in the configuration file** (no environment file dependencies except for `app_name`), providing better version control and easier deployment management.
+The package comes with a comprehensive configuration file located at `config/launchpad.php`. Most settings can be controlled via environment variables for better security and deployment management.
 
 ### Basic Settings
 
@@ -88,10 +94,15 @@ return [
     ],
     
     'license' => [
-        'enabled' => true,
-        'validator_class' => 'App\\Services\\EnvatoLicenseChecker',
-        'server_url' => null, // Set your license server URL
-        'timeout' => 30,
+        // License requirement is primarily controlled by environment variables
+        'enabled' => env('LAUNCHPAD_LICENSE_ENABLED', true),
+        'enforce_local' => env('LAUNCHPAD_ENFORCE_LOCAL', false),
+        'validator_class' => env('LAUNCHPAD_VALIDATOR_CLASS', 'App\\Services\\EnvatoLicenseChecker'),
+        'server_url' => env('LAUNCHPAD_LICENSE_SERVER'),
+        'timeout' => env('LAUNCHPAD_LICENSE_TIMEOUT', 30),
+        'cache_duration' => env('LAUNCHPAD_LICENSE_CACHE', 3600),
+        'retry_attempts' => 3,
+        'grace_period' => 24, // hours
     ],
     
     'ui' => [
@@ -666,6 +677,225 @@ php artisan route:clear
 - **Clear Progress Indicators**: Users see exactly what's happening
 - **Better Error Handling**: Graceful failures with helpful messages  
 - **Simpler Deployment**: Update config, deploy files, share URL
+
+## 🔐 Enhanced License System
+
+Laravel Launchpad includes a robust license validation system designed to be secure yet developer-friendly. The enhanced system provides multiple layers of security while maintaining ease of use.
+
+### 🛡️ Security Features
+
+- **Environment-Based Storage**: License keys stored securely in your project's `.env` file
+- **Encrypted Local Storage**: Automatic encrypted backup storage with restricted permissions
+- **Bypass Protection**: Cannot be easily disabled via config manipulation in production
+- **Grace Period**: Temporary failures don't immediately block access
+- **Retry Mechanism**: Automatic retry with exponential backoff for network issues
+
+### 🚀 Simple Developer API
+
+The new license system provides a much simpler API:
+
+```php
+use SabitAhmad\LaravelLaunchpad\Services\LicenseService;
+
+$licenseService = app(LicenseService::class);
+
+// Simple boolean check - handles everything automatically
+if ($licenseService->isLicenseVerified()) {
+    // License is valid, proceed with functionality
+    return view('premium-feature');
+} else {
+    // License is invalid or missing
+    return redirect()->route('license.required');
+}
+```
+
+### ⚙️ Environment Configuration
+
+Add these variables to your project's `.env` file:
+
+```bash
+# Required: Your license key
+LAUNCHPAD_LICENSE_KEY=your-actual-license-key-here
+
+# Optional: License server URL (if using remote validation)
+LAUNCHPAD_LICENSE_SERVER=https://your-license-server.com/api/validate
+
+# Optional: Disable license validation (use with caution in production)
+LAUNCHPAD_DISABLE_LICENSE=false
+
+# Optional: Force license validation even in local environment
+LAUNCHPAD_ENFORCE_LOCAL=false
+
+# Optional: Custom license validator class
+LAUNCHPAD_VALIDATOR_CLASS=App\\Services\\CustomLicenseValidator
+
+# Optional: Request timeout and cache duration
+LAUNCHPAD_LICENSE_TIMEOUT=30
+LAUNCHPAD_LICENSE_CACHE=3600
+```
+
+### 🎛️ Command Line Management
+
+Laravel Launchpad includes a powerful command-line interface for license management:
+
+#### Check License Status
+```bash
+php artisan launchpad:license status
+```
+
+#### Verify License Key
+```bash
+# Interactive mode
+php artisan launchpad:license verify
+
+# With key parameter
+php artisan launchpad:license verify --key=your-license-key
+```
+
+#### Remove Stored License
+```bash
+# With confirmation
+php artisan launchpad:license remove
+
+# Force removal without confirmation
+php artisan launchpad:license remove --force
+```
+
+#### Clear License Cache
+```bash
+php artisan launchpad:license clear-cache
+```
+
+### 📊 Detailed License Information
+
+For more detailed license information in your application:
+
+```php
+$licenseService = app(LicenseService::class);
+
+// Get comprehensive license status
+$status = $licenseService->getLicenseStatus();
+/*
+Returns array:
+[
+    'has_license' => true,
+    'is_valid' => true,
+    'source' => 'environment', // 'environment' or 'storage'
+    'message' => 'License is valid'
+]
+*/
+
+// Check if license validation is required
+if ($licenseService->isLicenseRequired()) {
+    // License validation is enabled
+}
+
+// Manual license validation (with custom data)
+$result = $licenseService->validateLicense('license-key', [
+    'additional_data' => 'custom-value'
+]);
+```
+
+### 🔧 Custom License Validator
+
+Create your own license validator by implementing the `LicenseValidatorInterface`:
+
+```php
+<?php
+
+namespace App\Services;
+
+use SabitAhmad\LaravelLaunchpad\Contracts\LicenseValidatorInterface;
+
+class CustomLicenseValidator implements LicenseValidatorInterface
+{
+    public function validate(string $licenseKey, array $additionalData = []): array
+    {
+        // Your custom validation logic here
+        $isValid = $this->performCustomValidation($licenseKey, $additionalData);
+        
+        return [
+            'valid' => $isValid,
+            'message' => $isValid ? 'License is valid' : 'License validation failed',
+            'data' => [], // Additional data if needed
+        ];
+    }
+    
+    private function performCustomValidation(string $licenseKey, array $data): bool
+    {
+        // Implement your license validation logic
+        // Could be API calls, database checks, file validation, etc.
+        return true; // or false
+    }
+}
+```
+
+Then register it in your `.env` file:
+```bash
+LAUNCHPAD_VALIDATOR_CLASS=App\\Services\\CustomLicenseValidator
+```
+
+### 🛠️ Troubleshooting
+
+#### License Not Found
+```bash
+# Check current status
+php artisan launchpad:license status
+
+# Add license key to .env file
+LAUNCHPAD_LICENSE_KEY=your-license-key
+
+# Or verify interactively
+php artisan launchpad:license verify
+```
+
+#### Validation Failures
+```bash
+# Clear cache and retry
+php artisan launchpad:license clear-cache
+php artisan launchpad:license verify
+
+# Check server connectivity
+curl -I https://your-license-server.com/api/validate
+```
+
+#### Permission Issues
+```bash
+# Fix storage permissions if needed
+chmod 600 storage/app/.license
+```
+
+### 🔄 Migration from Old System
+
+If you're upgrading from an older version:
+
+**Before (Old System)**:
+```php
+// Old method - easily bypassed
+$licenseService = app(LicenseService::class);
+$result = $licenseService->validateLicense('license-key');
+if ($result['valid']) {
+    // proceed
+}
+```
+
+**After (Enhanced System)**:
+```php
+// New method - secure and simple
+$licenseService = app(LicenseService::class);
+if ($licenseService->isLicenseVerified()) {
+    // proceed - handles validation, caching, and security automatically
+}
+```
+
+### 🏢 Production Best Practices
+
+1. **Store license key in environment variables** - Never hardcode in source code
+2. **Use HTTPS for license server** - Ensure encrypted communication
+3. **Monitor license validation** - Set up alerts for validation failures
+4. **Regular backups** - Include encrypted license storage in backups
+5. **Grace period configuration** - Allow temporary server outages
+6. **Log license events** - Track validation attempts and failures
 
 ## 🧪 Testing
 
