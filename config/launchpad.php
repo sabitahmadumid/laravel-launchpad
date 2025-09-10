@@ -83,24 +83,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | License Verification
+    | License Verification - SECURE CONFIGURATION
     |--------------------------------------------------------------------------
-    | SECURITY NOTE: The license system uses multiple layers of validation.
-    | License requirement is primarily controlled by environment variables
-    | for better security. Config settings serve as fallback only.
+    | SECURITY NOTE: This license system is designed to be very difficult to bypass.
+    | License validation is ALWAYS required in production environments.
+    | In local development, license can only be disabled through encrypted flags.
     |
-    | Environment Variables:
-    | - LAUNCHPAD_LICENSE_KEY: Your license key (recommended)
-    | - LAUNCHPAD_DISABLE_LICENSE: Set to 'true' to disable (production only)
+    | NO CONFIG-BASED BYPASSES ARE ALLOWED IN PRODUCTION
+    |
+    | To disable license validation in local development:
+    | php artisan launchpad:license disable-local
+    |
+    | To enable license validation in local development:
+    | php artisan launchpad:license enable-local
     |
     */
     'license' => [
-        // This setting can be overridden by environment variables
-        'enabled' => env('LAUNCHPAD_LICENSE_ENABLED', true),
-
-        // Enforce license validation even in local environment
-        'enforce_local' => env('LAUNCHPAD_ENFORCE_LOCAL', false),
-
         // Custom validator class (should implement LicenseValidatorInterface)
         'validator_class' => env('LAUNCHPAD_VALIDATOR_CLASS', 'App\\Services\\EnvatoLicenseChecker'),
 

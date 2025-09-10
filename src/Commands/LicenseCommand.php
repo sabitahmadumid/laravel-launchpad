@@ -8,7 +8,7 @@ use SabitAhmad\LaravelLaunchpad\Services\LicenseService;
 class LicenseCommand extends Command
 {
     protected $signature = 'launchpad:license 
-                           {action : The action to perform (status|verify|remove|clear-cache)}
+                           {action : The action to perform (status|verify|remove|clear-cache|enable-local|disable-local)}
                            {--key= : License key for verification}
                            {--force : Force the action without confirmation}';
 
@@ -31,6 +31,8 @@ class LicenseCommand extends Command
             'verify' => $this->verifyLicense(),
             'remove' => $this->removeLicense(),
             'clear-cache' => $this->clearCache(),
+            'enable-local' => $this->enableLocalEnforcement(),
+            'disable-local' => $this->disableLocalEnforcement(),
             default => $this->showError("Invalid action: {$action}")
         };
     }
@@ -139,20 +141,67 @@ class LicenseCommand extends Command
         }
     }
 
+    protected function enableLocalEnforcement(): int
+    {
+        if (!app()->environment('local')) {
+            $this->error('❌ This command can only be used in local environment.');
+            return 1;
+        }
+
+        try {
+            $this->licenseService->enableLocalEnforcement();
+            $this->info('✅ License enforcement enabled for local environment.');
+            $this->warn('⚠️  You will now need a valid license key even in local development.');
+            return 0;
+        } catch (\Exception $e) {
+            $this->error('❌ Error enabling local enforcement: ' . $e->getMessage());
+            return 1;
+        }
+    }
+
+    protected function disableLocalEnforcement(): int
+    {
+        if (!app()->environment('local')) {
+            $this->error('❌ This command can only be used in local environment.');
+            return 1;
+        }
+
+        if (!$this->option('force')) {
+            if (!$this->confirm('Are you sure you want to disable license enforcement in local environment?')) {
+                $this->info('Operation cancelled.');
+                return 0;
+            }
+        }
+
+        try {
+            $this->licenseService->disableLocalEnforcement();
+            $this->info('✅ License enforcement disabled for local environment.');
+            $this->line('🔓 License validation will be skipped in local development.');
+            return 0;
+        } catch (\Exception $e) {
+            $this->error('❌ Error disabling local enforcement: ' . $e->getMessage());
+            return 1;
+        }
+    }
+
     protected function showError(string $message): int
     {
         $this->error($message);
         $this->line('');
         $this->line('Available actions:');
-        $this->line('  status      - Show license status');
-        $this->line('  verify      - Verify a license key');
-        $this->line('  remove      - Remove stored license');
-        $this->line('  clear-cache - Clear license cache');
+        $this->line('  status       - Show license status');
+        $this->line('  verify       - Verify a license key');
+        $this->line('  remove       - Remove stored license');
+        $this->line('  clear-cache  - Clear license cache');
+        $this->line('  enable-local - Enable license enforcement in local environment');
+        $this->line('  disable-local- Disable license enforcement in local environment');
         $this->line('');
         $this->line('Examples:');
         $this->line('  php artisan launchpad:license status');
         $this->line('  php artisan launchpad:license verify --key=YOUR_LICENSE_KEY');
         $this->line('  php artisan launchpad:license remove --force');
+        $this->line('  php artisan launchpad:license enable-local');
+        $this->line('  php artisan launchpad:license disable-local --force');
 
         return 1;
     }

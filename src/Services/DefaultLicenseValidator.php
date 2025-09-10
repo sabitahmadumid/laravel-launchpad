@@ -21,22 +21,9 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
 
     public function validate(string $licenseKey, array $additionalData = []): array
     {
-        // Check environment override first
-        if (env('LAUNCHPAD_DISABLE_LICENSE') === 'true') {
-            return [
-                'valid' => true,
-                'message' => 'License validation is disabled via environment.',
-            ];
-        }
-
-        // Skip validation in local environment unless enforced
-        if (app()->environment('local') && ! config('launchpad.license.enforce_local', false)) {
-            return [
-                'valid' => true,
-                'message' => 'License validation skipped in local environment.',
-            ];
-        }
-
+        // NO CONFIG-BASED BYPASSES ALLOWED - Use LicenseService::isLicenseRequired() instead
+        // This validator only performs the actual license validation
+        
         // During installation, skip caching to avoid database dependency
         if (! $this->installationService->isInstalled()) {
             return $this->performValidation($licenseKey, $additionalData);

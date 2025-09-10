@@ -176,23 +176,92 @@ class LicenseService
     }
 
     /**
-     * Check if license validation is required
-     * This method is harder to bypass as it checks multiple conditions
+     * Check if license validation is required - SECURE VERSION
+     * This method is designed to be very difficult to bypass
      */
     public function isLicenseRequired(): bool
     {
-        // Check if we're in local environment
-        if (app()->environment('local', 'testing')) {
-            return config('launchpad.license.enforce_local', false);
+        // Get environment name through multiple methods to prevent tampering
+        $env = $this->getSecureEnvironment();
+        
+        // Only skip license validation in very specific local development scenarios
+        if ($this->isLocalDevelopment($env)) {
+            // Even in local, check if enforcement is enabled via encrypted flag
+            return $this->isLocalEnforcementEnabled();
         }
 
-        // Production always requires license unless explicitly disabled via environment
-        if (env('LAUNCHPAD_DISABLE_LICENSE') === 'true') {
+        // For production/staging/any non-local environment: ALWAYS require license
+        // No config-based bypasses allowed in production
+        return true;
+    }
+
+    /**
+     * Get environment name through multiple secure methods
+     */
+    protected function getSecureEnvironment(): string
+    {
+        // Check multiple sources to prevent easy tampering
+        $env1 = env('APP_ENV', 'production');
+        $env2 = config('app.env', 'production');
+        $env3 = app()->environment();
+        
+        // If any method returns production, treat as production
+        if (in_array('production', [$env1, $env2, $env3])) {
+            return 'production';
+        }
+        
+        // For consistency, all methods should agree on local
+        if ($env1 === 'local' && $env2 === 'local' && $env3 === 'local') {
+            return 'local';
+        }
+        
+        // If inconsistent, default to production (most secure)
+        return 'production';
+    }
+
+    /**
+     * Check if this is truly a local development environment
+     */
+    protected function isLocalDevelopment(string $env): bool
+    {
+        if ($env !== 'local') {
             return false;
         }
+        
+        // Additional checks to verify it's actually local development
+        $isLocalhost = in_array($_SERVER['HTTP_HOST'] ?? '', [
+            'localhost',
+            '127.0.0.1',
+            '::1',
+            'localhost:8000',
+            '127.0.0.1:8000'
+        ]);
+        
+        $hasVendorDir = is_dir(base_path('vendor'));
+        $hasComposerJson = file_exists(base_path('composer.json'));
+        
+        // Must be localhost AND have development files
+        return $isLocalhost && $hasVendorDir && $hasComposerJson;
+    }
 
-        // Check config (but this can be overridden by environment)
-        return config('launchpad.license.enabled', true);
+    /**
+     * Check if local enforcement is enabled via encrypted flag
+     */
+    protected function isLocalEnforcementEnabled(): bool
+    {
+        $flagFile = storage_path('app/.license_enforce');
+        
+        if (!file_exists($flagFile)) {
+            return false;
+        }
+        
+        try {
+            $encrypted = file_get_contents($flagFile);
+            $decrypted = decrypt($encrypted);
+            return $decrypted === 'enforce_license_locally';
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
@@ -212,6 +281,28 @@ class LicenseService
             unlink($this->licenseFile);
         }
         $this->invalidateCache();
+    }
+
+    /**
+     * Enable license enforcement in local environment
+     */
+    public function enableLocalEnforcement(): void
+    {
+        $flagFile = storage_path('app/.license_enforce');
+        $encrypted = encrypt('enforce_license_locally');
+        file_put_contents($flagFile, $encrypted);
+        chmod($flagFile, 0600);
+    }
+
+    /**
+     * Disable license enforcement in local environment
+     */
+    public function disableLocalEnforcement(): void
+    {
+        $flagFile = storage_path('app/.license_enforce');
+        if (file_exists($flagFile)) {
+            unlink($flagFile);
+        }
     }
 
     /**
