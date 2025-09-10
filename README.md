@@ -2,7 +2,16 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/sabitahmadumid/laravel-launchpad.svg?style=flat-square)](https://packagist.org/packages/sabitahmadumid/laravel-launchpad)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/sabitahmadumid/laravel-launchpad/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/sabitahmadumid/laravel-launchpad/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/sabitahmadumid/laravel-launchpad/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/sabitahmadumid/laravel-launchpad/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/sabitahmadumid/laravel-launchpad/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https:/### 🛡️ Security Features
+
+- **Automatic Environment Storage**: License keys automatically saved to `.env` file during verification
+- **Encrypted Local Backup**: Secondary encrypted storage with restricted permissions
+- **BYPASS PROTECTION**: **Cannot be disabled via config in production** - License validation is **ALWAYS** required in production environments
+- **Multi-Layer Environment Detection**: Uses multiple methods to detect environment and prevent tampering
+- **Localhost Verification**: Additional checks to ensure local development is genuine
+- **Encrypted Local Flags**: Local enforcement managed through encrypted storage, not config files
+- **Grace Period**: Temporary failures don't immediately block access
+- **Retry Mechanism**: Automatic retry with exponential backoff for network issues.com/sabitahmadumid/laravel-launchpad/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/sabitahmadumid/laravel-launchpad.svg?style=flat-square)](https://packagist.org/packages/sabitahmadumid/laravel-launchpad)
 
 **Laravel Launchpad** is a comprehensive installation and update wizard package that makes it incredibly easy for developers to ship their Laravel applications and for end-users to install them. With professional UI components, license validation, environment checking, and a streamlined automatic process, Launchpad transforms complex deployments into simple, guided experiences.
@@ -716,12 +725,6 @@ While license keys are automatically managed, you can optionally configure these
 # Optional: License server URL (if using remote validation)
 LAUNCHPAD_LICENSE_SERVER=https://your-license-server.com/api/validate
 
-# Optional: Disable license validation (use with caution in production)
-LAUNCHPAD_DISABLE_LICENSE=false
-
-# Optional: Force license validation even in local environment
-LAUNCHPAD_ENFORCE_LOCAL=false
-
 # Optional: Custom license validator class
 LAUNCHPAD_VALIDATOR_CLASS=App\\Services\\CustomLicenseValidator
 
@@ -731,6 +734,8 @@ LAUNCHPAD_LICENSE_CACHE=3600
 ```
 
 **Note**: The `LAUNCHPAD_LICENSE_KEY` is automatically added to your `.env` file when users verify their license during installation or update.
+
+**IMPORTANT SECURITY NOTICE**: License validation **cannot be disabled via configuration** in production environments. This is by design to prevent easy bypassing.
 
 ### 🎛️ Command Line Management
 
@@ -763,6 +768,17 @@ php artisan launchpad:license remove --force
 ```bash
 php artisan launchpad:license clear-cache
 ```
+
+#### Local Development License Management
+```bash
+# Enable license enforcement in local environment
+php artisan launchpad:license enable-local
+
+# Disable license enforcement in local environment  
+php artisan launchpad:license disable-local
+```
+
+**Note**: Local enforcement commands only work in local development environment and use encrypted flags for security.
 
 ### 📊 Detailed License Information
 
