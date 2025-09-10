@@ -83,6 +83,12 @@ class LicenseCommand extends Command
                 $this->info('✅ License verified successfully!');
                 $this->line('Message: '.($result['message'] ?? 'License is valid'));
 
+                if ($result['env_updated'] ?? false) {
+                    $this->info('📄 License key automatically saved to .env file');
+                } else {
+                    $this->warn('⚠️  License key stored locally (could not update .env file)');
+                }
+
                 return 0;
             } else {
                 $this->error('❌ License verification failed.');
