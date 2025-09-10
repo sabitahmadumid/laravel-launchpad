@@ -30,7 +30,7 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
         }
 
         // Skip validation in local environment unless enforced
-        if (app()->environment('local') && !config('launchpad.license.enforce_local', false)) {
+        if (app()->environment('local') && ! config('launchpad.license.enforce_local', false)) {
             return [
                 'valid' => true,
                 'message' => 'License validation skipped in local environment.',
@@ -93,7 +93,7 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
                         'app_name' => config('app.name', 'Laravel App'),
                     ], $additionalData),
                     'headers' => [
-                        'User-Agent' => 'Laravel-Launchpad/' . config('launchpad.update.current_version', '1.0.0'),
+                        'User-Agent' => 'Laravel-Launchpad/'.config('launchpad.update.current_version', '1.0.0'),
                         'Accept' => 'application/json',
                     ],
                 ]);
@@ -113,19 +113,19 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
 
             } catch (RequestException $e) {
                 $lastException = $e;
-                
+
                 // Don't retry on client errors (4xx)
                 if ($e->hasResponse() && $e->getResponse()->getStatusCode() >= 400 && $e->getResponse()->getStatusCode() < 500) {
                     break;
                 }
-                
+
                 // Wait before retry (exponential backoff)
                 if ($attempt < $retryAttempts) {
                     sleep(pow(2, $attempt - 1));
                 }
             } catch (\Exception $e) {
                 $lastException = $e;
-                
+
                 // Wait before retry
                 if ($attempt < $retryAttempts) {
                     sleep(1);
@@ -144,7 +144,7 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
 
         return [
             'valid' => false,
-            'message' => 'License validation failed after ' . $retryAttempts . ' attempts: ' . 
+            'message' => 'License validation failed after '.$retryAttempts.' attempts: '.
                         ($lastException ? $lastException->getMessage() : 'Unknown error'),
             'attempts' => $retryAttempts,
         ];
@@ -157,13 +157,13 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
     {
         $gracePeriod = config('launchpad.license.grace_period', 24); // hours
         $lastValidation = Cache::get('launchpad_last_successful_validation');
-        
-        if (!$lastValidation) {
+
+        if (! $lastValidation) {
             return false;
         }
 
         $graceExpiry = $lastValidation + ($gracePeriod * 3600); // Convert hours to seconds
-        
+
         return time() < $graceExpiry;
     }
 }

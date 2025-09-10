@@ -97,25 +97,25 @@ return [
     'license' => [
         // This setting can be overridden by environment variables
         'enabled' => env('LAUNCHPAD_LICENSE_ENABLED', true),
-        
+
         // Enforce license validation even in local environment
         'enforce_local' => env('LAUNCHPAD_ENFORCE_LOCAL', false),
-        
+
         // Custom validator class (should implement LicenseValidatorInterface)
         'validator_class' => env('LAUNCHPAD_VALIDATOR_CLASS', 'App\\Services\\EnvatoLicenseChecker'),
-        
+
         // External license server URL (if using remote validation)
         'server_url' => env('LAUNCHPAD_LICENSE_SERVER'),
-        
+
         // Request timeout for license validation
         'timeout' => env('LAUNCHPAD_LICENSE_TIMEOUT', 30),
-        
+
         // Cache duration for license validation results (in seconds)
         'cache_duration' => env('LAUNCHPAD_LICENSE_CACHE', 3600),
-        
+
         // Validation retry attempts
         'retry_attempts' => 3,
-        
+
         // Grace period for license validation failures (in hours)
         'grace_period' => 24,
     ],

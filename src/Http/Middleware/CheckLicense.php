@@ -22,7 +22,7 @@ class CheckLicense
     public function handle(Request $request, Closure $next): Response
     {
         // If license is not required, allow access
-        if (!$this->licenseService->isLicenseRequired()) {
+        if (! $this->licenseService->isLicenseRequired()) {
             return $next($request);
         }
 
@@ -48,7 +48,7 @@ class CheckLicense
         }
 
         // If license is not verified, redirect to license verification
-        if (!$licenseVerified) {
+        if (! $licenseVerified) {
             $isInstallRoute = str_contains($request->route()->getName(), 'install');
             $redirectRoute = $isInstallRoute ? 'launchpad.install.license' : 'launchpad.update.license';
 

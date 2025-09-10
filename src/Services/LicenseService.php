@@ -10,7 +10,9 @@ use SabitAhmad\LaravelLaunchpad\Contracts\LicenseValidatorInterface;
 class LicenseService
 {
     protected LicenseValidatorInterface $validator;
+
     protected string $licenseFile;
+
     protected string $cacheKey = 'launchpad_license_status';
 
     public function __construct()
@@ -31,7 +33,7 @@ class LicenseService
     public function isLicenseVerified(): bool
     {
         // Check if license validation is required
-        if (!$this->isLicenseRequired()) {
+        if (! $this->isLicenseRequired()) {
             return true;
         }
 
@@ -43,7 +45,7 @@ class LicenseService
 
         // Get license key from environment or storage
         $licenseKey = $this->getLicenseKey();
-        if (!$licenseKey) {
+        if (! $licenseKey) {
             return false;
         }
 
@@ -67,10 +69,10 @@ class LicenseService
         $this->storeLicenseKey($licenseKey);
 
         $result = $this->validator->validate($licenseKey, $additionalData);
-        
+
         // Clear cache when validating
         Cache::forget($this->cacheKey);
-        
+
         return $result;
     }
 
@@ -88,6 +90,7 @@ class LicenseService
         // Try storage file
         if (file_exists($this->licenseFile)) {
             $encrypted = file_get_contents($this->licenseFile);
+
             return $this->decryptLicenseKey($encrypted);
         }
 
@@ -106,7 +109,7 @@ class LicenseService
 
         $encrypted = $this->encryptLicenseKey($licenseKey);
         file_put_contents($this->licenseFile, $encrypted);
-        
+
         // Make file readable only by owner
         chmod($this->licenseFile, 0600);
     }
@@ -156,13 +159,13 @@ class LicenseService
     public function getLicenseStatus(): array
     {
         $licenseKey = $this->getLicenseKey();
-        
-        if (!$licenseKey) {
+
+        if (! $licenseKey) {
             return [
                 'has_license' => false,
                 'is_valid' => false,
                 'source' => null,
-                'message' => 'No license key found'
+                'message' => 'No license key found',
             ];
         }
 
@@ -173,7 +176,7 @@ class LicenseService
             'has_license' => true,
             'is_valid' => $isValid,
             'source' => $source,
-            'message' => $isValid ? 'License is valid' : 'License validation failed'
+            'message' => $isValid ? 'License is valid' : 'License validation failed',
         ];
     }
 
@@ -184,7 +187,7 @@ class LicenseService
     {
         $key = config('app.key');
         $cipher = config('app.cipher', 'AES-256-CBC');
-        
+
         return encrypt($licenseKey);
     }
 
