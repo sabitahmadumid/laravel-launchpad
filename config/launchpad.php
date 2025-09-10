@@ -85,13 +85,39 @@ return [
     |--------------------------------------------------------------------------
     | License Verification
     |--------------------------------------------------------------------------
+    | SECURITY NOTE: The license system uses multiple layers of validation.
+    | License requirement is primarily controlled by environment variables
+    | for better security. Config settings serve as fallback only.
+    |
+    | Environment Variables:
+    | - LAUNCHPAD_LICENSE_KEY: Your license key (recommended)
+    | - LAUNCHPAD_DISABLE_LICENSE: Set to 'true' to disable (production only)
+    |
     */
     'license' => [
-        'enabled' => true,
-        'validator_class' => 'App\\Services\\EnvatoLicenseChecker',
-        'server_url' => null,
-        'timeout' => 30,
-        'cache_duration' => 3600, // Cache license verification for 1 hour
+        // This setting can be overridden by environment variables
+        'enabled' => env('LAUNCHPAD_LICENSE_ENABLED', true),
+        
+        // Enforce license validation even in local environment
+        'enforce_local' => env('LAUNCHPAD_ENFORCE_LOCAL', false),
+        
+        // Custom validator class (should implement LicenseValidatorInterface)
+        'validator_class' => env('LAUNCHPAD_VALIDATOR_CLASS', 'App\\Services\\EnvatoLicenseChecker'),
+        
+        // External license server URL (if using remote validation)
+        'server_url' => env('LAUNCHPAD_LICENSE_SERVER'),
+        
+        // Request timeout for license validation
+        'timeout' => env('LAUNCHPAD_LICENSE_TIMEOUT', 30),
+        
+        // Cache duration for license validation results (in seconds)
+        'cache_duration' => env('LAUNCHPAD_LICENSE_CACHE', 3600),
+        
+        // Validation retry attempts
+        'retry_attempts' => 3,
+        
+        // Grace period for license validation failures (in hours)
+        'grace_period' => 24,
     ],
 
     /*

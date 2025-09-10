@@ -4,24 +4,30 @@ namespace SabitAhmad\LaravelLaunchpad\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use SabitAhmad\LaravelLaunchpad\Services\LicenseService;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckLicense
 {
+    protected LicenseService $licenseService;
+
+    public function __construct(LicenseService $licenseService)
+    {
+        $this->licenseService = $licenseService;
+    }
+
     /**
      * Handle an incoming request.
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $licenseEnabled = config('launchpad.license.enabled', false);
-
-        // If license is not enabled, allow access
-        if (! $licenseEnabled) {
+        // If license is not required, allow access
+        if (!$this->licenseService->isLicenseRequired()) {
             return $next($request);
         }
 
-        // Check if license has been verified in session
-        $licenseVerified = session('license_verified', false);
+        // Check if license is verified
+        $licenseVerified = $this->licenseService->isLicenseVerified();
 
         // Allow access to license verification routes
         $allowedRoutes = [
@@ -42,9 +48,12 @@ class CheckLicense
         }
 
         // If license is not verified, redirect to license verification
-        if (! $licenseVerified) {
+        if (!$licenseVerified) {
             $isInstallRoute = str_contains($request->route()->getName(), 'install');
             $redirectRoute = $isInstallRoute ? 'launchpad.install.license' : 'launchpad.update.license';
+
+            // Store original intended URL
+            session(['intended_url' => $request->url()]);
 
             return redirect()->route($redirectRoute)->with('error', 'Please verify your license to continue.');
         }
