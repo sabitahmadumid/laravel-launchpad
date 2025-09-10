@@ -190,31 +190,6 @@ return [
 ];
 ```
 
-### 🔑 Key Configuration Changes
-
-**Self-Contained Configuration**: All Launchpad-specific settings are stored directly in the config file rather than environment variables, making deployment and version control easier.
-
-**Environment Dependencies Removed**: 
-- `installation.enabled` - Set directly in config (no `LAUNCHPAD_INSTALLATION_ENABLED`)
-- `update.enabled` - Set directly in config (no `LAUNCHPAD_UPDATE_ENABLED`)  
-- `update.current_version` - Set directly in config (no `APP_VERSION` dependency)
-- `license.enabled` - Set directly in config (no `LAUNCHPAD_LICENSE_ENABLED`)
-- All other Launchpad settings use direct values
-
-**Only APP_NAME Uses Environment**: 
-```php
-'app_name' => env('APP_NAME', 'Laravel Application'), // Only env dependency kept
-```
-
-### Automatic Operation Flow
-
-**All operations are now automatic based on configuration** - users don't make choices during installation/update:
-
-- **Database Setup**: Automatically runs all enabled options from `importOptions`
-- **Update Process**: Automatically runs all enabled options from `update_options`  
-- **Route Security**: Installation/update routes automatically disabled after completion
-- **No User Checkboxes**: Configuration determines what operations run
-
 ### Dynamic Fields
 
 You can add custom fields to the admin creation step:
@@ -391,8 +366,6 @@ For updates, you can also choose between SQL dumps or migrations:
 >
 > - **Installation Mode**: For fresh deployments (new installs)
 > - **Update Mode**: For existing installations (version updates)
-
-### 🤖 Automatic Operation Flow
 
 **All installation and update operations are now completely automatic** - no user choices or checkboxes! The system automatically:
 
