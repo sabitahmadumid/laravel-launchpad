@@ -97,11 +97,20 @@ class UpdateController extends Controller
             ], 422);
         }
 
+        // Validate license and automatically save to .env if valid
         $result = $this->licenseService->validateLicense($request->license_key);
 
+        // Store verification status in session
         session(['license_verified' => $result['valid']]);
 
-        return response()->json($result);
+        // Return enhanced response with env update status
+        return response()->json([
+            'success' => $result['valid'],
+            'valid' => $result['valid'],
+            'message' => $result['message'],
+            'env_updated' => $result['env_updated'] ?? false,
+            'data' => $result['data'] ?? [],
+        ]);
     }
 
     /**
