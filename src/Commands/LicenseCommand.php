@@ -143,8 +143,9 @@ class LicenseCommand extends Command
 
     protected function enableLocalEnforcement(): int
     {
-        if (!app()->environment('local')) {
+        if (! app()->environment('local')) {
             $this->error('❌ This command can only be used in local environment.');
+
             return 1;
         }
 
@@ -152,23 +153,27 @@ class LicenseCommand extends Command
             $this->licenseService->enableLocalEnforcement();
             $this->info('✅ License enforcement enabled for local environment.');
             $this->warn('⚠️  You will now need a valid license key even in local development.');
+
             return 0;
         } catch (\Exception $e) {
-            $this->error('❌ Error enabling local enforcement: ' . $e->getMessage());
+            $this->error('❌ Error enabling local enforcement: '.$e->getMessage());
+
             return 1;
         }
     }
 
     protected function disableLocalEnforcement(): int
     {
-        if (!app()->environment('local')) {
+        if (! app()->environment('local')) {
             $this->error('❌ This command can only be used in local environment.');
+
             return 1;
         }
 
-        if (!$this->option('force')) {
-            if (!$this->confirm('Are you sure you want to disable license enforcement in local environment?')) {
+        if (! $this->option('force')) {
+            if (! $this->confirm('Are you sure you want to disable license enforcement in local environment?')) {
                 $this->info('Operation cancelled.');
+
                 return 0;
             }
         }
@@ -177,9 +182,11 @@ class LicenseCommand extends Command
             $this->licenseService->disableLocalEnforcement();
             $this->info('✅ License enforcement disabled for local environment.');
             $this->line('🔓 License validation will be skipped in local development.');
+
             return 0;
         } catch (\Exception $e) {
-            $this->error('❌ Error disabling local enforcement: ' . $e->getMessage());
+            $this->error('❌ Error disabling local enforcement: '.$e->getMessage());
+
             return 1;
         }
     }

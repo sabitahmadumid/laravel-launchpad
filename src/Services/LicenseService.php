@@ -183,7 +183,7 @@ class LicenseService
     {
         // Get environment name through multiple methods to prevent tampering
         $env = $this->getSecureEnvironment();
-        
+
         // Only skip license validation in very specific local development scenarios
         if ($this->isLocalDevelopment($env)) {
             // Even in local, check if enforcement is enabled via encrypted flag
@@ -204,17 +204,17 @@ class LicenseService
         $env1 = env('APP_ENV', 'production');
         $env2 = config('app.env', 'production');
         $env3 = app()->environment();
-        
+
         // If any method returns production, treat as production
         if (in_array('production', [$env1, $env2, $env3])) {
             return 'production';
         }
-        
+
         // For consistency, all methods should agree on local
         if ($env1 === 'local' && $env2 === 'local' && $env3 === 'local') {
             return 'local';
         }
-        
+
         // If inconsistent, default to production (most secure)
         return 'production';
     }
@@ -227,19 +227,19 @@ class LicenseService
         if ($env !== 'local') {
             return false;
         }
-        
+
         // Additional checks to verify it's actually local development
         $isLocalhost = in_array($_SERVER['HTTP_HOST'] ?? '', [
             'localhost',
             '127.0.0.1',
             '::1',
             'localhost:8000',
-            '127.0.0.1:8000'
+            '127.0.0.1:8000',
         ]);
-        
+
         $hasVendorDir = is_dir(base_path('vendor'));
         $hasComposerJson = file_exists(base_path('composer.json'));
-        
+
         // Must be localhost AND have development files
         return $isLocalhost && $hasVendorDir && $hasComposerJson;
     }
@@ -250,14 +250,15 @@ class LicenseService
     protected function isLocalEnforcementEnabled(): bool
     {
         $flagFile = storage_path('app/.license_enforce');
-        
-        if (!file_exists($flagFile)) {
+
+        if (! file_exists($flagFile)) {
             return false;
         }
-        
+
         try {
             $encrypted = file_get_contents($flagFile);
             $decrypted = decrypt($encrypted);
+
             return $decrypted === 'enforce_license_locally';
         } catch (\Exception $e) {
             return false;
