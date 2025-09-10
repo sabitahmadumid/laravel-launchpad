@@ -2,6 +2,109 @@
 
 All notable changes to `laravel-launchpad` will be documented in this file.
 
+## [2.2.0] - 2025-09-11
+
+### 🔒 Ultra-Secure License System - Major Security Overhaul
+
+This release implements an enterprise-grade license validation system that is virtually impossible to bypass for normal users while maintaining developer-friendly automation.
+
+### ✨ New Features
+
+- **🛡️ Bypass-Proof License System**
+  - **ZERO config-based bypasses** allowed in production environments
+  - License validation **ALWAYS required** in production
+  - Multi-layer environment detection prevents tampering
+  - Secure localhost verification for genuine local development
+
+- **🔐 Automatic License Management**
+  - License keys **automatically saved to .env** during installation/update flow
+  - Users simply enter license key - system handles everything automatically  
+  - Enhanced installation/update controllers with automatic license storage
+  - Encrypted local storage fallback with restricted file permissions
+
+- **🎛️ Advanced Command Line Interface**
+  - `php artisan launchpad:license status` - Comprehensive license status
+  - `php artisan launchpad:license verify` - Auto-save verified licenses to .env
+  - `php artisan launchpad:license enable-local` - Encrypted local enforcement
+  - `php artisan launchpad:license disable-local` - Secure local development mode
+  - `php artisan launchpad:license remove` - Clean license removal
+  - `php artisan launchpad:license clear-cache` - Cache management
+
+- **🔧 Encrypted Local Development Control**
+  - Local enforcement managed through encrypted flags only
+  - No config-based bypasses in any environment
+  - Secure command-based local development management
+  - File permissions automatically set to 600 (owner-only)
+
+### 🔄 Changed (Breaking Changes)
+
+- **License Validation (Breaking Changes)**
+  - `BREAKING:` Removed `LAUNCHPAD_DISABLE_LICENSE` environment variable
+  - `BREAKING:` Removed `config('launchpad.license.enabled')` bypass option
+  - `BREAKING:` Removed `enforce_local` config-based setting
+  - `BREAKING:` License validation **cannot be disabled via config** in production
+  - `BREAKING:` Local development control requires encrypted flags only
+
+- **Enhanced API Methods**
+  - `validateLicense()` now automatically saves valid licenses to .env file
+  - Enhanced response with `env_updated` status indicator
+  - Improved error handling with fallback to encrypted local storage
+
+### 🛡️ Security Improvements
+
+- **Multi-Layer Environment Detection**
+  - Uses 3 different methods to detect environment (env, config, app instance)
+  - If any method reports "production", treats as production
+  - Inconsistent detection defaults to production (most secure)
+
+- **Localhost Verification System**
+  - Verifies actual localhost addresses (127.0.0.1, localhost, ::1)
+  - Checks for development environment indicators (vendor/, composer.json)
+  - Must pass ALL checks to qualify as local development
+
+- **Encrypted Flag Management**
+  - Local enforcement stored in encrypted `storage/app/.license_enforce` file
+  - Uses Laravel's encryption system (not easily tamperable)
+  - Automatic file permission management (600)
+
+### 📚 Documentation Updates
+
+- **Security-Focused Documentation**
+  - Emphasized bypass protection throughout README
+  - Removed misleading environment variable options
+  - Added comprehensive security notices
+  - Updated examples to reflect automatic workflow
+
+- **Command Line Documentation**
+  - Complete command reference with security examples
+  - Local development management instructions
+  - Production deployment best practices
+
+### 🏗️ Technical Implementation
+
+- **LicenseService Enhancements**
+  - `updateEnvFile()` method for automatic .env writing (follows DatabaseService pattern)
+  - `getSecureEnvironment()` with multi-method validation
+  - `isLocalDevelopment()` with comprehensive local verification
+  - `enableLocalEnforcement()` / `disableLocalEnforcement()` for encrypted flag management
+
+- **Controller Improvements**
+  - InstallationController enhanced with automatic license storage
+  - UpdateController enhanced with automatic license storage  
+  - Both return `env_updated` status in API responses
+
+- **DefaultLicenseValidator Security**
+  - Removed ALL bypass mechanisms from validator
+  - License requirement checking moved to LicenseService only
+  - Clean separation of concerns
+
+### 🚀 User Experience
+
+- **Installation Flow**: Users enter license → System validates & saves to .env → Installation continues
+- **Update Flow**: Users enter license → System validates & saves to .env → Update continues  
+- **Development**: Simple commands for local enforcement management
+- **Production**: Zero bypass options - always secure
+
 ## [2.0.0] - 2025-09-09
 
 ### 🚀 Major Version Release - Breaking Changes
