@@ -66,21 +66,21 @@ class LicenseService
     public function validateLicense(string $licenseKey, array $additionalData = []): array
     {
         $result = $this->validator->validate($licenseKey, $additionalData);
-        
+
         // If license is valid, automatically save it to .env file
         if ($result['valid']) {
             try {
                 $this->updateEnvFile($licenseKey);
                 $result['env_updated'] = true;
-                $result['message'] = ($result['message'] ?? 'License is valid') . ' License key saved automatically.';
+                $result['message'] = ($result['message'] ?? 'License is valid').' License key saved automatically.';
             } catch (\Exception $e) {
                 // Don't fail the validation if env update fails, just store locally
                 $this->storeLicenseKey($licenseKey);
                 $result['env_updated'] = false;
-                $result['message'] = ($result['message'] ?? 'License is valid') . ' License key stored locally (could not update .env file).';
+                $result['message'] = ($result['message'] ?? 'License is valid').' License key stored locally (could not update .env file).';
             }
         }
-        
+
         // Clear cache when validating
         Cache::forget($this->cacheKey);
 
@@ -94,13 +94,13 @@ class LicenseService
     {
         $envFile = base_path('.env');
 
-        if (!file_exists($envFile)) {
+        if (! file_exists($envFile)) {
             throw new \Exception('.env file not found');
         }
 
         // Create backup of .env file
-        $backupFile = $envFile . '.backup.' . time();
-        if (!copy($envFile, $backupFile)) {
+        $backupFile = $envFile.'.backup.'.time();
+        if (! copy($envFile, $backupFile)) {
             throw new \Exception('Could not create .env backup file');
         }
 
@@ -110,17 +110,17 @@ class LicenseService
             $key = 'LAUNCHPAD_LICENSE_KEY';
             $value = $licenseKey;
             $pattern = "/^{$key}=.*/m";
-            $replacement = "{$key}=\"" . str_replace('"', '\"', $value) . "\"";
+            $replacement = "{$key}=\"".str_replace('"', '\"', $value).'"';
 
             if (preg_match($pattern, $envContent)) {
                 // Update existing key
                 $envContent = preg_replace($pattern, $replacement, $envContent);
             } else {
                 // Add new key at the end
-                $envContent = rtrim($envContent) . "\n\n# Laravel Launchpad License\n{$replacement}\n";
+                $envContent = rtrim($envContent)."\n\n# Laravel Launchpad License\n{$replacement}\n";
             }
 
-            if (!file_put_contents($envFile, $envContent)) {
+            if (! file_put_contents($envFile, $envContent)) {
                 throw new \Exception('Could not write to .env file');
             }
 
@@ -133,7 +133,7 @@ class LicenseService
                 copy($backupFile, $envFile);
                 @unlink($backupFile);
             }
-            throw new \Exception('Failed to update .env file: ' . $e->getMessage());
+            throw new \Exception('Failed to update .env file: '.$e->getMessage());
         }
     }
 
