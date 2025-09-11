@@ -7,7 +7,7 @@ return [
     'welcome_description' => 'The installation process includes the following steps:',
     'getting_started' => 'Getting Started',
     'lets_begin' => 'Let\'s begin the installation process.',
-    
+
     // Steps
     'steps' => [
         'welcome' => 'Welcome',
@@ -17,7 +17,7 @@ return [
         'admin' => 'Admin',
         'final' => 'Final',
     ],
-    
+
     // Step descriptions
     'step_descriptions' => [
         'welcome' => 'Welcome and overview',
@@ -27,7 +27,7 @@ return [
         'admin' => 'Create admin account',
         'final' => 'Complete installation',
     ],
-    
+
     // Requirements
     'requirements_title' => 'System Requirements',
     'requirements_description' => 'Please ensure your system meets the following requirements:',
@@ -39,7 +39,7 @@ return [
     'extensions' => 'PHP Extensions',
     'permissions' => 'File Permissions',
     'directories' => 'Directory Access',
-    
+
     // License
     'license_title' => 'License Verification',
     'license_description' => 'Please enter your license key to proceed with the installation.',
@@ -49,7 +49,7 @@ return [
     'license_valid' => 'License is valid!',
     'license_invalid' => 'Invalid license key. Please check and try again.',
     'license_required' => 'A valid license key is required to proceed.',
-    
+
     // Database
     'database_title' => 'Database Configuration',
     'database_description' => 'Configure your database connection settings.',
@@ -64,7 +64,7 @@ return [
     'connection_failed' => 'Database connection failed. Please check your settings.',
     'database_setup_successful' => 'Database setup completed successfully!',
     'database_setup_failed' => 'Database setup failed. Please try again.',
-    
+
     // Admin
     'admin_title' => 'Admin Account',
     'admin_description' => 'Create your administrator account.',
@@ -75,20 +75,20 @@ return [
     'create_admin' => 'Create Admin Account',
     'admin_created' => 'Admin account created successfully!',
     'admin_creation_failed' => 'Failed to create admin account. Please try again.',
-    
+
     // Final
     'final_title' => 'Complete Installation',
     'final_description' => 'Review your installation settings and complete the process.',
     'installation_summary' => 'Installation Summary',
     'complete_installation' => 'Complete Installation',
-    
+
     // Success
     'success_title' => 'Installation Complete!',
     'success_message' => 'Your application has been successfully installed and configured.',
     'success_description' => 'You can now start using your application.',
     'go_to_application' => 'Go to Application',
     'installation_completed' => 'Installation completed successfully!',
-    
+
     // Common messages
     'processing' => 'Processing...',
     'validating' => 'Validating...',

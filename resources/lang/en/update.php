@@ -9,16 +9,16 @@ return [
     'new_version' => 'New Version',
     'update_available' => 'Update Available',
     'no_update_required' => 'No update required. You are running the latest version.',
-    
+
     // Steps
     'steps' => [
         'welcome' => 'Welcome',
-        'requirements' => 'Requirements', 
+        'requirements' => 'Requirements',
         'license' => 'License',
         'update' => 'Update',
         'success' => 'Success',
     ],
-    
+
     // Step descriptions
     'step_descriptions' => [
         'welcome' => 'Welcome and version info',
@@ -27,7 +27,7 @@ return [
         'update' => 'Perform update',
         'success' => 'Update completed',
     ],
-    
+
     // Requirements (reuse from install)
     'requirements_title' => 'System Requirements',
     'requirements_description' => 'Please ensure your system meets the following requirements for the update:',
@@ -35,7 +35,7 @@ return [
     'requirements_recheck' => 'Re-check Requirements',
     'requirements_all_met' => 'All requirements are met! You can proceed with the update.',
     'requirements_some_failed' => 'Some requirements are not met. Please fix them before continuing.',
-    
+
     // License (reuse from install)
     'license_title' => 'License Verification',
     'license_description' => 'Please verify your license key to proceed with the update.',
@@ -45,7 +45,7 @@ return [
     'license_valid' => 'License is valid!',
     'license_invalid' => 'Invalid license key. Please check and try again.',
     'license_required' => 'A valid license key is required to proceed.',
-    
+
     // Update process
     'update_title' => 'Update Process',
     'update_description' => 'Select the update options and start the update process.',
@@ -58,7 +58,7 @@ return [
     'update_in_progress' => 'Update in progress...',
     'update_completed' => 'Update completed successfully!',
     'update_failed' => 'Update failed. Please check the logs and try again.',
-    
+
     // Success
     'success_title' => 'Update Complete!',
     'success_message' => 'Your application has been successfully updated.',
@@ -66,7 +66,7 @@ return [
     'new_version_installed' => 'New version installed',
     'go_to_application' => 'Go to Application',
     'view_changelog' => 'View Changelog',
-    
+
     // Common messages
     'processing' => 'Processing...',
     'updating' => 'Updating...',

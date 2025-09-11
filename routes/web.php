@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use SabitAhmad\LaravelLaunchpad\Http\Controllers\InstallationController;
-use SabitAhmad\LaravelLaunchpad\Http\Controllers\UpdateController;
 use SabitAhmad\LaravelLaunchpad\Http\Controllers\LanguageController;
+use SabitAhmad\LaravelLaunchpad\Http\Controllers\UpdateController;
 
 // Language routes - Available for both installation and update
 Route::group([

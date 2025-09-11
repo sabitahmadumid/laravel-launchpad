@@ -3,7 +3,6 @@
 namespace SabitAhmad\LaravelLaunchpad\Services;
 
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
 
 class LanguageService
@@ -33,8 +32,6 @@ class LanguageService
 
     /**
      * Get available languages
-     *
-     * @return array
      */
     public function getAvailableLanguages(): array
     {
@@ -43,8 +40,6 @@ class LanguageService
 
     /**
      * Get current language
-     *
-     * @return string
      */
     public function getCurrentLanguage(): string
     {
@@ -53,8 +48,6 @@ class LanguageService
 
     /**
      * Get default language
-     *
-     * @return string
      */
     public function getDefaultLanguage(): string
     {
@@ -63,13 +56,10 @@ class LanguageService
 
     /**
      * Set current language
-     *
-     * @param string $language
-     * @return bool
      */
     public function setLanguage(string $language): bool
     {
-        if (!$this->isLanguageAvailable($language)) {
+        if (! $this->isLanguageAvailable($language)) {
             return false;
         }
 
@@ -81,9 +71,6 @@ class LanguageService
 
     /**
      * Check if language is available
-     *
-     * @param string $language
-     * @return bool
      */
     public function isLanguageAvailable(string $language): bool
     {
@@ -92,26 +79,21 @@ class LanguageService
 
     /**
      * Get language info
-     *
-     * @param string|null $language
-     * @return array|null
      */
     public function getLanguageInfo(?string $language = null): ?array
     {
         $language = $language ?? $this->getCurrentLanguage();
-        
+
         return self::AVAILABLE_LANGUAGES[$language] ?? null;
     }
 
     /**
      * Initialize language for request
-     *
-     * @return void
      */
     public function initializeLanguage(): void
     {
         $currentLanguage = $this->getCurrentLanguage();
-        
+
         if ($this->isLanguageAvailable($currentLanguage)) {
             App::setLocale($currentLanguage);
         } else {
@@ -122,21 +104,16 @@ class LanguageService
 
     /**
      * Get language direction (LTR/RTL)
-     *
-     * @param string|null $language
-     * @return string
      */
     public function getLanguageDirection(?string $language = null): string
     {
         $languageInfo = $this->getLanguageInfo($language);
-        
+
         return ($languageInfo['rtl'] ?? false) ? 'rtl' : 'ltr';
     }
 
     /**
      * Check if current language is RTL
-     *
-     * @return bool
      */
     public function isRtl(): bool
     {
@@ -145,24 +122,19 @@ class LanguageService
 
     /**
      * Get translated string with fallback
-     *
-     * @param string $key
-     * @param array $replace
-     * @param string|null $locale
-     * @return string
      */
     public function trans(string $key, array $replace = [], ?string $locale = null): string
     {
         $locale = $locale ?? $this->getCurrentLanguage();
-        
+
         // Try to get translation in current locale
         $translation = __($key, $replace, $locale);
-        
+
         // If translation not found and locale is not default, try default locale
         if ($translation === $key && $locale !== self::DEFAULT_LANGUAGE) {
             $translation = __($key, $replace, self::DEFAULT_LANGUAGE);
         }
-        
+
         return $translation;
     }
 }
