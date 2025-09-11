@@ -18,34 +18,33 @@ class LanguageController extends Controller
     /**
      * Switch language
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function switch(Request $request)
     {
         $language = $request->get('language');
-        
-        if (!$language) {
+
+        if (! $language) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Language parameter is required'
+                    'message' => 'Language parameter is required',
                 ], 400);
             }
-            
+
             return redirect()->back()->with('error', 'Language parameter is required');
         }
 
         $success = $this->languageService->setLanguage($language);
-        
-        if (!$success) {
+
+        if (! $success) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid language selected'
+                    'message' => 'Invalid language selected',
                 ], 400);
             }
-            
+
             return redirect()->back()->with('error', 'Invalid language selected');
         }
 
@@ -54,7 +53,7 @@ class LanguageController extends Controller
                 'success' => true,
                 'message' => 'Language changed successfully',
                 'language' => $language,
-                'language_info' => $this->languageService->getLanguageInfo($language)
+                'language_info' => $this->languageService->getLanguageInfo($language),
             ]);
         }
 
@@ -76,7 +75,7 @@ class LanguageController extends Controller
         return response()->json([
             'languages' => $this->languageService->getAvailableLanguages(),
             'current' => $this->languageService->getCurrentLanguage(),
-            'default' => $this->languageService->getDefaultLanguage()
+            'default' => $this->languageService->getDefaultLanguage(),
         ]);
     }
 
@@ -88,11 +87,11 @@ class LanguageController extends Controller
     public function current()
     {
         $currentLanguage = $this->languageService->getCurrentLanguage();
-        
+
         return response()->json([
             'language' => $currentLanguage,
             'info' => $this->languageService->getLanguageInfo($currentLanguage),
-            'direction' => $this->languageService->getLanguageDirection($currentLanguage)
+            'direction' => $this->languageService->getLanguageDirection($currentLanguage),
         ]);
     }
 }
