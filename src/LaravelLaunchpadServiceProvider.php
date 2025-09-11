@@ -5,9 +5,11 @@ namespace SabitAhmad\LaravelLaunchpad;
 use SabitAhmad\LaravelLaunchpad\Commands\LaravelLaunchpadCommand;
 use SabitAhmad\LaravelLaunchpad\Commands\LicenseCommand;
 use SabitAhmad\LaravelLaunchpad\Commands\PublishLicenseStubCommand;
+use SabitAhmad\LaravelLaunchpad\Commands\PublishLanguageCommand;
 use SabitAhmad\LaravelLaunchpad\Http\Middleware\CheckInstallation;
 use SabitAhmad\LaravelLaunchpad\Http\Middleware\CheckLicense;
 use SabitAhmad\LaravelLaunchpad\Http\Middleware\RedirectIfInstalled;
+use SabitAhmad\LaravelLaunchpad\Http\Middleware\SetLanguage;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -24,11 +26,13 @@ class LaravelLaunchpadServiceProvider extends PackageServiceProvider
             ->name('laravel-launchpad')
             ->hasConfigFile('launchpad')
             ->hasViews()
+            ->hasTranslations()
             ->hasMigration('create_launchpad_table')
             ->hasCommands([
                 LaravelLaunchpadCommand::class,
                 LicenseCommand::class,
                 PublishLicenseStubCommand::class,
+                PublishLanguageCommand::class,
             ]);
     }
 
@@ -41,6 +45,7 @@ class LaravelLaunchpadServiceProvider extends PackageServiceProvider
         $this->app['router']->aliasMiddleware('check.installation', CheckInstallation::class);
         $this->app['router']->aliasMiddleware('redirect.if.installed', RedirectIfInstalled::class);
         $this->app['router']->aliasMiddleware('check.license', CheckLicense::class);
+        $this->app['router']->aliasMiddleware('set.language', SetLanguage::class);
         $this->app['router']->aliasMiddleware('ensure.file.session', \SabitAhmad\LaravelLaunchpad\Http\Middleware\EnsureFileSession::class);
         $this->app['router']->aliasMiddleware('ensure.file.cache', \SabitAhmad\LaravelLaunchpad\Http\Middleware\EnsureFileCache::class);
 
@@ -54,6 +59,10 @@ class LaravelLaunchpadServiceProvider extends PackageServiceProvider
                 __DIR__.'/../resources/views' => resource_path('views/vendor/launchpad'),
             ], 'laravel-launchpad-views');
 
+            $this->publishes([
+                __DIR__.'/../resources/lang' => resource_path('lang/vendor/launchpad'),
+            ], 'laravel-launchpad-lang');
+
             // Also register without specific tags for --all option
             $this->publishes([
                 __DIR__.'/../config/launchpad.php' => config_path('launchpad.php'),
@@ -62,6 +71,10 @@ class LaravelLaunchpadServiceProvider extends PackageServiceProvider
             $this->publishes([
                 __DIR__.'/../resources/views' => resource_path('views/vendor/launchpad'),
             ], 'views');
+
+            $this->publishes([
+                __DIR__.'/../resources/lang' => resource_path('lang/vendor/launchpad'),
+            ], 'lang');
         }
     }
 
@@ -89,5 +102,8 @@ class LaravelLaunchpadServiceProvider extends PackageServiceProvider
             \SabitAhmad\LaravelLaunchpad\Contracts\LicenseValidatorInterface::class,
             \SabitAhmad\LaravelLaunchpad\Services\DefaultLicenseValidator::class
         );
+
+        // Register language service
+        $this->app->singleton(\SabitAhmad\LaravelLaunchpad\Services\LanguageService::class);
     }
 }
