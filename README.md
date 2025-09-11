@@ -27,12 +27,14 @@ Perfect for SaaS applications, commercial Laravel products, or any Laravel appli
 
 - **🎯 Automatic Installation Wizard** - 5-step guided installation process with automatic configuration-based setup
 - **🔄 Automatic Update Wizard** - 5-step guided update process with automatic version upgrades  
+- **🌍 Multi-Language Support** - Built-in internationalization system, easily extendable to any language
 - **⚠️ Mutually Exclusive Modes** - Installation and update wizards are designed to run independently (never simultaneously)
 - **🤖 Configuration-Driven Flow** - No user choices required - all operations automatic based on configuration
 - **🔒 Auto-Security** - Installation/update routes automatically disabled after successful completion
 - **🛡️ License Validation** - Flexible license verification system with external server support
 - **⚙️ Environment Checking** - PHP version, extensions, and directory permissions validation
 - **🎨 Professional UI** - Modern, responsive interface built with Tailwind CSS and Alpine.js
+- **🔄 Language Switcher** - Beautiful dropdown with flag icons and native language names
 - **🔧 Self-Contained Configuration** - All settings managed in config files, minimal environment dependencies
 - **🏗️ Clean Architecture** - Service-oriented design with proper separation of concerns
 - **📱 Mobile Responsive** - Works perfectly on all devices and screen sizes
@@ -62,6 +64,135 @@ Optionally, publish the views for customization:
 
 ```bash
 php artisan vendor:publish --tag="laravel-launchpad-views"
+```
+
+Optionally, publish the language files for customization:
+
+```bash
+php artisan vendor:publish --tag="laravel-launchpad-lang"
+```
+
+Or use the dedicated command:
+
+```bash
+php artisan launchpad:publish-lang
+```
+
+## 🌍 Internationalization (i18n)
+
+Laravel Launchpad supports multiple languages out of the box, making it perfect for global applications.
+
+### 🗣️ Supported Languages
+
+- **English** (en) - Default language
+- **Multiple Languages** - Easily add any language with simple translation files
+
+### 🚀 Quick Start with Languages
+
+The package automatically detects and applies user language preferences. No additional setup required!
+
+### 🎛️ Language Features
+
+- **🔄 Dynamic Language Switching** - Users can switch languages during installation/update
+- **🎨 Beautiful Language Switcher** - Dropdown with flag icons and native names  
+- **📱 RTL Support Ready** - Infrastructure for right-to-left languages
+- **🔤 Smart Fallbacks** - Falls back to English if translation missing
+- **💾 Session Persistence** - Remembers user's language choice
+
+### 📁 Language File Structure
+
+```
+resources/lang/vendor/launchpad/
+├── en/
+│   ├── common.php      # Common UI elements
+│   ├── install.php     # Installation wizard
+│   └── update.php      # Update wizard
+└── {lang}/
+    ├── common.php      # Translated UI elements
+    ├── install.php     # Translated installation wizard
+    └── update.php      # Translated update wizard
+```
+
+### 🛠️ Adding Custom Languages
+
+1. **Publish language files:**
+   ```bash
+   php artisan launchpad:publish-lang
+   ```
+
+2. **Create new language directory:**
+   ```bash
+   mkdir resources/lang/vendor/launchpad/es  # For Spanish
+   ```
+
+3. **Copy and translate files:**
+   ```bash
+   cp -r resources/lang/vendor/launchpad/en/* resources/lang/vendor/launchpad/es/
+   ```
+
+4. **Update configuration:**
+   ```php
+   // config/launchpad.php
+   'language' => [
+       'available' => [
+           'en' => ['name' => 'English', 'native' => 'English', 'flag' => '🇺🇸'],
+           'es' => ['name' => 'Spanish', 'native' => 'Español', 'flag' => '��'],
+           'fr' => ['name' => 'French', 'native' => 'Français', 'flag' => '��'],
+           // Add any language you want
+       ],
+   ],
+   ```
+
+### 🎯 Language Configuration Options
+
+```php
+'language' => [
+    'default' => 'en',                              // Default language
+    'auto_detect' => true,                          // Auto-detect from browser
+    'session_key' => 'launchpad_language',          // Session storage key
+    'switcher' => [
+        'enabled' => true,                          // Show language switcher
+        'show_flags' => true,                       // Show flag icons
+        'show_native_names' => true,                // Show native language names
+        'position' => 'top-right',                  // Switcher position
+    ],
+],
+```
+
+### 🔧 Programmatic Language Control
+
+```php
+// Get language service
+$languageService = app(\SabitAhmad\LaravelLaunchpad\Services\LanguageService::class);
+
+// Switch language
+$languageService->setLanguage('es'); // or any available language
+
+// Get current language
+$current = $languageService->getCurrentLanguage();
+
+// Check available languages
+$available = $languageService->getAvailableLanguages();
+
+// Check if RTL
+$isRtl = $languageService->isRtl();
+```
+
+### 🌐 API Endpoints
+
+```bash
+# Switch language via POST
+POST /launchpad/language/switch
+{
+    "language": "es",
+    "redirect": "/install"
+}
+
+# Get available languages
+GET /launchpad/language/available
+
+# Get current language info
+GET /launchpad/language/current
 ```
 
 ## ⚙️ Configuration
