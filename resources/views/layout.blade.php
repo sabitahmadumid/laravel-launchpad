@@ -64,7 +64,6 @@
                             @yield('step-indicator', '')
                         </div>
                     </div>
-                    </div>
                 </div>
             </div>
         </header>
@@ -79,7 +78,7 @@
         @endif
 
         <!-- Main Content -->
-        <main class="flex-1 py-8">
+        <main class="flex-1 py-6">
             <div class="max-w-4xl mx-auto px-4">
                 @yield('content')
             </div>
