@@ -87,17 +87,31 @@ function languageSwitcher() {
             // Close dropdown
             this.open = false;
             
-            // Show loading state
-            const button = this.$el.querySelector('button');
-            const originalContent = button.innerHTML;
-            button.innerHTML = '<span class="animate-spin">⏳</span> {{ __("launchpad::common.loading") }}';
-            button.disabled = true;
+            // Show loading state - find button more safely
+            let button = null;
+            try {
+                button = this.$el?.querySelector('button') || document.querySelector('.language-switcher button');
+            } catch (e) {
+                console.warn('Could not find language switcher button');
+            }
+            
+            let originalContent = '';
+            if (button) {
+                originalContent = button.innerHTML;
+                button.innerHTML = '<span class="animate-spin">⏳</span> {{ __("launchpad::common.loading") }}';
+                button.disabled = true;
+            }
             
             // Create form data
             const formData = new FormData();
             formData.append('language', language);
             formData.append('redirect', window.location.href);
-            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+            
+            // Get CSRF token safely
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            if (csrfToken) {
+                formData.append('_token', csrfToken);
+            }
             
             // Submit language change
             fetch('{{ route("launchpad.language.switch") }}', {
@@ -115,15 +129,19 @@ function languageSwitcher() {
                     window.location.reload();
                 } else {
                     // Restore button and show error
-                    button.innerHTML = originalContent;
-                    button.disabled = false;
+                    if (button) {
+                        button.innerHTML = originalContent;
+                        button.disabled = false;
+                    }
                     alert(data.message || 'Failed to change language');
                 }
             })
             .catch(error => {
                 // Restore button and show error
-                button.innerHTML = originalContent;
-                button.disabled = false;
+                if (button) {
+                    button.innerHTML = originalContent;
+                    button.disabled = false;
+                }
                 console.error('Language switch error:', error);
                 alert('Failed to change language');
             });
