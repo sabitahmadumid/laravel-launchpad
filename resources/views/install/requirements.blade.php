@@ -1,35 +1,35 @@
 @extends('launchpad::layout')
 
-@section('title', 'System Requirements')
+@section('title', __('launchpad::install.requirements_title'))
 
-@section('step-indicator', 'Step 2 of 5')
+@section('step-indicator', __('launchpad::common.step_of', ['current' => 2, 'total' => 5]))
 
 @section('progress')
     <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
             <div class="flex items-center">
                 <div class="step-completed w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">✓</div>
-                <span class="ml-2 text-sm text-gray-500">Welcome</span>
+                <span class="ml-2 text-sm text-gray-500">{{ __('launchpad::install.steps.welcome') }}</span>
             </div>
             <div class="flex-1 h-1 bg-green-200 mx-4"></div>
             <div class="flex items-center">
                 <div class="step-active w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">2</div>
-                <span class="ml-2 text-sm font-medium text-gray-900">Requirements</span>
+                <span class="ml-2 text-sm font-medium text-gray-900">{{ __('launchpad::install.steps.requirements') }}</span>
             </div>
             <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
             <div class="flex items-center">
                 <div class="step-inactive w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">3</div>
-                <span class="ml-2 text-sm text-gray-500">License</span>
+                <span class="ml-2 text-sm text-gray-500">{{ __('launchpad::install.steps.license') }}</span>
             </div>
             <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
             <div class="flex items-center">
                 <div class="step-inactive w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">4</div>
-                <span class="ml-2 text-sm text-gray-500">Database</span>
+                <span class="ml-2 text-sm text-gray-500">{{ __('launchpad::install.steps.database') }}</span>
             </div>
             <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
             <div class="flex items-center">
                 <div class="step-inactive w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">5</div>
-                <span class="ml-2 text-sm text-gray-500">Complete</span>
+                <span class="ml-2 text-sm text-gray-500">{{ __('launchpad::install.steps.final') }}</span>
             </div>
         </div>
     </div>
@@ -39,9 +39,9 @@
 <div x-data="requirementsChecker()" class="space-y-6">
     <div class="bg-white rounded-lg shadow-sm p-8">
         <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">System Requirements</h2>
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">{{ __('launchpad::install.requirements_title') }}</h2>
             <p class="text-lg text-gray-600">
-                Let's check if your server meets all the requirements for installation.
+                {{ __('launchpad::install.requirements_description') }}
             </p>
         </div>
 
@@ -162,25 +162,25 @@
         <div class="flex justify-between items-center pt-6 border-t">
             <a href="{{ route('launchpad.install.welcome') }}" 
                class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200">
-                ← Back
+                ← {{ __('launchpad::common.back') }}
             </a>
             
             <div class="flex items-center space-x-4">
                 <button @click="checkRequirements()" 
                         :disabled="loading"
                         class="px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors duration-200 disabled:opacity-50">
-                    <span x-show="!loading">Re-check</span>
-                    <span x-show="loading" x-cloak>Checking...</span>
+                    <span x-show="!loading">{{ __('launchpad::install.requirements_recheck') }}</span>
+                    <span x-show="loading" x-cloak>{{ __('launchpad::common.checking') }}</span>
                 </button>
                 
                 @if($allMet)
                     <a href="{{ route('launchpad.install.license') }}" 
                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
-                        Continue →
+                        {{ __('launchpad::common.continue') }} →
                     </a>
                 @else
                     <button disabled class="px-6 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed">
-                        Fix Requirements First
+                        {{ __('launchpad::install.requirements_fix_first') }}
                     </button>
                 @endif
             </div>
