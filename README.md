@@ -682,7 +682,112 @@ $canConnect = $databaseService->testConnection([
 ]);
 ```
 
-## 🎨 Customization
+## � Multi-Language Support
+
+Laravel Launchpad includes a powerful translation system that supports multiple languages out of the box. Users can switch languages during installation using the built-in language selector.
+
+### Available Languages
+
+- **English** (en) - Default language
+- **Bengali** (bn) - বাংলা
+
+### Language Switching
+
+Users can switch languages at any time during installation using the dropdown selector in the top-right corner. The selected language is automatically saved and persists throughout the installation process.
+
+### Adding New Languages
+
+To add support for additional languages:
+
+1. **Create language directory:**
+   ```bash
+   mkdir -p resources/lang/{locale}
+   ```
+
+2. **Copy English translation files:**
+   ```bash
+   cp resources/lang/en/install.php resources/lang/{locale}/
+   cp resources/lang/en/common.php resources/lang/{locale}/
+   ```
+
+3. **Translate the content:** Edit the copied files and translate all values while keeping the keys unchanged.
+
+4. **Update language selector:** Add your language to the language selector by modifying the view or using the configuration.
+
+### Translation Structure
+
+The translation system uses a hierarchical structure:
+
+```php
+// Field labels
+'fields' => [
+    'admin' => [
+        'name' => 'Full Name',
+        'email' => 'Email Address',
+        'password' => 'Password',
+    ],
+    'site_settings' => [
+        'app_name' => 'Application Name',
+        'app_url' => 'Application URL',
+    ],
+],
+
+// Field placeholders
+'field_placeholders' => [
+    'name' => 'Enter your full name',
+    'email' => 'Enter your email address',
+    'app_name' => 'My Laravel App',
+],
+
+// Select options
+'field_options' => [
+    'mail_mailer' => [
+        'smtp' => 'SMTP',
+        'sendmail' => 'Sendmail',
+        'mailgun' => 'Mailgun',
+    ],
+],
+```
+
+### Automatic Field Translation
+
+The system automatically translates dynamic form fields based on naming conventions. You don't need to modify your configuration - just add translations and they'll be picked up automatically:
+
+```php
+// Configuration (no changes needed)
+'admin' => [
+    'fields' => [
+        'name' => [
+            'type' => 'text',
+            'required' => true,
+        ],
+    ],
+],
+
+// Translation file (resources/lang/{locale}/install.php)
+'fields' => [
+    'admin' => [
+        'name' => 'Your Translation Here',
+    ],
+],
+```
+
+### Programmatic Language Control
+
+You can also control the language programmatically:
+
+```php
+// Set language via route
+POST /install/language
+{
+    "locale": "bn"
+}
+
+// Get current language
+GET /install/language/current
+```
+
+## �🎨 Customization
 
 ### Views
 
