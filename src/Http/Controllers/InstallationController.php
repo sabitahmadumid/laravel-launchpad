@@ -197,10 +197,14 @@ class InstallationController extends Controller
      */
     public function admin()
     {
+        // Ensure language is properly initialized
+        $languageService = app(\SabitAhmad\LaravelLaunchpad\Services\LanguageService::class);
+        $languageService->initializeLanguage();
+        
         $adminConfig = config('launchpad.admin', []);
         $additionalFields = config('launchpad.additional_fields', []);
 
-        return view('launchpad::install.admin', compact('adminConfig', 'additionalFields'));
+        return view('launchpad::install.admin', compact('adminConfig', 'additionalFields', 'languageService'));
     }
 
     public function createAdmin(Request $request)
