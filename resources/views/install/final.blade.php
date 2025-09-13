@@ -1,6 +1,6 @@
 @extends('launchpad::layout')
 
-@section('title', 'Final Installation')
+@section('title', __('launchpad::install.final_title'))
 
 @section('content')
 <div x-data="finalInstallation()" class="space-y-6">
@@ -12,9 +12,9 @@
                 </svg>
             </div>
             
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">Complete Installation</h2>
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">{{ __('launchpad::install.final_title') }}</h2>
             <p class="text-lg text-gray-600">
-                Great! Your database is configured and admin user is created. Click below to finalize the installation.
+                {{ __('launchpad::install.final_description') }}
             </p>
         </div>
 
@@ -26,7 +26,7 @@
                     <svg class="h-5 w-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                     </svg>
-                    Installation Progress
+                    {{ __('launchpad::install.installation_progress') }}
                 </h3>
                 
                 <div class="space-y-3">
@@ -34,35 +34,25 @@
                         <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
-                        <span class="text-gray-700">System requirements checked</span>
+                        <span class="text-gray-700">{{ __('launchpad::install.requirements_all_met') }}</span>
                     </div>
                     <div class="flex items-center space-x-3">
                         <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
-                        <span class="text-gray-700">License verified</span>
+                        <span class="text-gray-700">{{ __('launchpad::install.license_valid') }}</span>
                     </div>
                     <div class="flex items-center space-x-3">
                         <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
-                        <span class="text-gray-700">Database configured and set up</span>
+                        <span class="text-gray-700">{{ __('launchpad::install.database_setup_successful') }}</span>
                     </div>
                     <div class="flex items-center space-x-3">
                         <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
-                        <span class="text-gray-700">Admin user created</span>
-                    </div>
-                </div>
-            </div>
-                            <h4 class="text-sm font-medium text-amber-800">Important Notes:</h4>
-                            <ul class="text-sm text-amber-700 mt-1 space-y-1">
-                                <li>• If you have existing data, choose carefully to avoid data loss</li>
-                                <li>• Dump files will overwrite existing data</li>
-                                <li>• Migrations and seeders are recommended for new installations</li>
-                            </ul>
-                        </div>
+                        <span class="text-gray-700">{{ __('launchpad::install.admin_created') }}</span>
                     </div>
                 </div>
             </div>
@@ -74,7 +64,7 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <h4 class="text-lg font-semibold text-blue-900">Installing Application...</h4>
+                    <h4 class="text-lg font-semibold text-blue-900">{{ __('launchpad::install.installation_in_progress') }}</h4>
                 </div>
                 
                 <div class="space-y-2">
@@ -86,7 +76,7 @@
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <span class="text-sm">Updating configuration files...</span>
+                        <span class="text-sm">{{ __('launchpad::install.updating_permissions') }}</span>
                     </div>
                     
                     <div class="flex items-center space-x-2" :class="{'text-green-600': installationSteps.database, 'text-gray-400': !installationSteps.database && !installationSteps.config, 'text-blue-600': !installationSteps.database && installationSteps.config}">
@@ -97,7 +87,7 @@
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <span class="text-sm">Setting up database...</span>
+                        <span class="text-sm">{{ __('launchpad::install.creating_cache') }}</span>
                     </div>
                     
                     <div class="flex items-center space-x-2" :class="{'text-green-600': installationSteps.admin, 'text-gray-400': !installationSteps.admin && !installationSteps.database, 'text-blue-600': !installationSteps.admin && installationSteps.database}">
@@ -108,7 +98,7 @@
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <span class="text-sm">Creating admin account...</span>
+                        <span class="text-sm">{{ __('launchpad::install.configuring_security') }}</span>
                     </div>
                     
                     <div class="flex items-center space-x-2" :class="{'text-green-600': installationSteps.finalize, 'text-gray-400': !installationSteps.finalize && !installationSteps.admin, 'text-blue-600': !installationSteps.finalize && installationSteps.admin}">
@@ -119,7 +109,7 @@
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <span class="text-sm">Finalizing installation...</span>
+                        <span class="text-sm">{{ __('launchpad::install.finalizing_setup') }}</span>
                     </div>
                 </div>
             </div>
@@ -132,7 +122,7 @@
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                         </svg>
                         <div>
-                            <h4 class="text-sm font-medium text-red-800">Installation Failed</h4>
+                            <h4 class="text-sm font-medium text-red-800">{{ __('launchpad::install.installation_failed') }}</h4>
                             <p class="text-sm text-red-700 mt-1" x-text="errorMessage"></p>
                         </div>
                     </div>
@@ -145,7 +135,7 @@
                 class="w-full bg-green-600 text-white py-4 px-6 rounded-lg font-medium text-lg hover:bg-green-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 x-show="!installing"
             >
-                🚀 Complete Installation
+                🚀 {{ __('launchpad::install.complete_installation') }}
             </button>
         </form>
     </div>
