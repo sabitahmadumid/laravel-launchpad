@@ -20,9 +20,9 @@ if (config('launchpad.installation.enabled', false)) {
     Route::group([
         'prefix' => config('launchpad.installation.route_prefix', 'install'),
         'middleware' => array_merge(
-            ['ensure.file.session', 'ensure.file.cache', 'set.language'],
+            ['ensure.file.session', 'ensure.file.cache'],
             config('launchpad.installation.route_middleware', ['web']),
-            ['redirect.if.installed']
+            ['set.language', 'redirect.if.installed']
         ),
     ], function () {
         // Welcome and Requirements - No license check needed
@@ -56,8 +56,8 @@ if (config('launchpad.update.enabled', false)) {
     Route::group([
         'prefix' => config('launchpad.update.route_prefix', 'update'),
         'middleware' => array_merge(
-            ['set.language'],
-            config('launchpad.update.route_middleware', ['web'])
+            config('launchpad.update.route_middleware', ['web']),
+            ['set.language']
         ),
     ], function () {
         // Welcome and Requirements - No license check needed
