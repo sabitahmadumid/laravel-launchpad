@@ -3,8 +3,6 @@
 namespace SabitAhmad\LaravelLaunchpad\Services;
 
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
 class LanguageService
@@ -49,7 +47,7 @@ class LanguageService
         if (app()->bound('session') && app('session')->isStarted()) {
             return Session::get('launchpad_language', $this->getDefaultLanguage());
         }
-        
+
         // Fallback to app locale if session is not available
         return app()->getLocale() ?: $this->getDefaultLanguage();
     }
@@ -75,7 +73,7 @@ class LanguageService
         if (app()->bound('session') && app('session')->isStarted()) {
             Session::put('launchpad_language', $language);
         }
-        
+
         // Always set Laravel's locale
         App::setLocale($language);
 
@@ -115,8 +113,6 @@ class LanguageService
             $this->setLanguage($defaultLanguage);
         }
     }
-
-
 
     /**
      * Get language direction (LTR/RTL)

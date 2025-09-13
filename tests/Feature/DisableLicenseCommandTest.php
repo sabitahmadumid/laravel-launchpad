@@ -84,7 +84,7 @@ PHP;
 
         // Mock the config path for this test
         $command = $this->artisan('launchpad:license-disable');
-        
+
         // We expect it to show an error since the config format might not match exactly
         // But at least verify it doesn't crash
         $this->assertTrue(true); // Test passes if no exceptions are thrown

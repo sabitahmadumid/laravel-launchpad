@@ -37,11 +37,11 @@ class SetLanguage
 
         // Always initialize language for the request to ensure proper locale
         $this->languageService->initializeLanguage();
-        
+
         // Ensure locale is set in Laravel
         $currentLanguage = $this->languageService->getCurrentLanguage();
         app()->setLocale($currentLanguage);
-        
+
         // Clear any translation cache to ensure fresh translations
         if (app()->bound('translator')) {
             $translator = app('translator');

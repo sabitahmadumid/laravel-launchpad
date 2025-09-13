@@ -27,7 +27,7 @@ return [
     'select_language' => 'ভাষা নির্বাচন করুন',
     'version' => 'সংস্করণ',
     'status' => 'অবস্থা',
-            'completed' => 'সম্পূর্ণ',
+    'completed' => 'সম্পূর্ণ',
     'test_connection_note' => 'এগিয়ে যাওয়ার আগে আমরা সংযোগ পরীক্ষা করব।',
     'select' => 'নির্বাচন করুন',
     'checking' => 'পরীক্ষা করা হচ্ছে...',

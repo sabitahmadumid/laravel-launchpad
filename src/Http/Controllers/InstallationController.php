@@ -200,7 +200,7 @@ class InstallationController extends Controller
         // Ensure language is properly initialized
         $languageService = app(\SabitAhmad\LaravelLaunchpad\Services\LanguageService::class);
         $languageService->initializeLanguage();
-        
+
         $adminConfig = config('launchpad.admin', []);
         $additionalFields = config('launchpad.additional_fields', []);
 

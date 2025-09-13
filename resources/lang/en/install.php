@@ -213,7 +213,7 @@ return [
     'check_logs' => 'Check Logs',
     'error_occurred' => 'An error occurred',
     'installation_interrupted' => 'Installation was interrupted. Please try again.',
-    
+
     // Success Page
     'success_title' => 'Installation Complete!',
     'success_congratulations' => 'Congratulations!',

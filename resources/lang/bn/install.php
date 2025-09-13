@@ -200,7 +200,7 @@ return [
     'check_logs' => 'লগ পরীক্ষা করুন',
     'error_occurred' => 'একটি ত্রুটি ঘটেছে',
     'installation_interrupted' => 'ইনস্টলেশন বাধাগ্রস্ত হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
-    
+
     // Success Page
     'success_title' => 'ইনস্টলেশন সম্পূর্ণ!',
     'success_congratulations' => 'অভিনন্দন!',
