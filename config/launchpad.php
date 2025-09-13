@@ -23,7 +23,7 @@ return [
         'route_prefix' => 'update',
         'route_middleware' => ['web'],
         'version_file' => storage_path('app/version.lock'),
-        'current_version' => '2.1.1',
+        'current_version' => '2.2.0',
     ],
 
     /*
@@ -116,6 +116,48 @@ return [
 
         // Grace period for license validation failures (in hours)
         'grace_period' => 24,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Language & Internationalization
+    |--------------------------------------------------------------------------
+    | Configure multi-language support for the installation and update wizards.
+    | Users can switch between available languages during the process.
+    */
+    'language' => [
+        // Default language for the package
+        'default' => env('LAUNCHPAD_DEFAULT_LANGUAGE', 'en'),
+
+        // Available languages
+        'available' => [
+            'en' => [
+                'name' => 'English',
+                'native' => 'English',
+                'flag' => '🇺🇸',
+                'rtl' => false,
+            ],
+            'bn' => [
+                'name' => 'Bengali',
+                'native' => 'বাংলা',
+                'flag' => '🇧🇩',
+                'rtl' => false,
+            ],
+        ],
+
+        // Auto-detect language from browser preferences
+        'auto_detect' => env('LAUNCHPAD_AUTO_DETECT_LANGUAGE', true),
+
+        // Store language preference in session
+        'session_key' => 'launchpad_language',
+
+        // Language switcher display settings
+        'switcher' => [
+            'enabled' => true,
+            'show_flags' => true,
+            'show_native_names' => true,
+            'position' => 'top-right', // top-left, top-right, bottom-left, bottom-right
+        ],
     ],
 
     /*

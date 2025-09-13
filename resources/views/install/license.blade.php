@@ -1,35 +1,35 @@
 @extends('launchpad::layout')
 
-@section('title', 'License Verification')
+@section('title', __('launchpad::install.license_title'))
 
-@section('step-indicator', 'Step 3 of 5')
+@section('step-indicator', __('launchpad::common.step_of', ['current' => 3, 'total' => 5]))
 
 @section('progress')
     <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
             <div class="flex items-center">
                 <div class="step-completed w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">✓</div>
-                <span class="ml-2 text-sm text-gray-500">Welcome</span>
+                <span class="ml-2 text-sm text-gray-500">{{ __('launchpad::install.steps.welcome') }}</span>
             </div>
             <div class="flex-1 h-1 bg-green-200 mx-4"></div>
             <div class="flex items-center">
                 <div class="step-completed w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">✓</div>
-                <span class="ml-2 text-sm text-gray-500">Requirements</span>
+                <span class="ml-2 text-sm text-gray-500">{{ __('launchpad::install.steps.requirements') }}</span>
             </div>
             <div class="flex-1 h-1 bg-green-200 mx-4"></div>
             <div class="flex items-center">
                 <div class="step-active w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">3</div>
-                <span class="ml-2 text-sm font-medium text-gray-900">License</span>
+                <span class="ml-2 text-sm font-medium text-gray-900">{{ __('launchpad::install.steps.license') }}</span>
             </div>
             <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
             <div class="flex items-center">
                 <div class="step-inactive w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">4</div>
-                <span class="ml-2 text-sm text-gray-500">Database</span>
+                <span class="ml-2 text-sm text-gray-500">{{ __('launchpad::install.steps.database') }}</span>
             </div>
             <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
             <div class="flex items-center">
                 <div class="step-inactive w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">5</div>
-                <span class="ml-2 text-sm text-gray-500">Complete</span>
+                <span class="ml-2 text-sm text-gray-500">{{ __('launchpad::install.steps.final') }}</span>
             </div>
         </div>
     </div>
@@ -45,28 +45,28 @@
                 </svg>
             </div>
             
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">License Verification</h2>
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">{{ __('launchpad::install.license_title') }}</h2>
             <p class="text-lg text-gray-600">
-                Please enter your license key to verify your purchase and continue with the installation.
+                {{ __('launchpad::install.license_description') }}
             </p>
         </div>
 
         <form @submit.prevent="verifyLicense()" class="max-w-md mx-auto space-y-6">
             <div>
                 <label for="license_key" class="block text-sm font-medium text-gray-700 mb-2">
-                    License Key / Purchase Code
+                    {{ __('launchpad::install.license_key') }}
                 </label>
                 <input 
                     type="text" 
                     id="license_key"
                     x-model="licenseKey"
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter your license key"
+                    placeholder="{{ __('launchpad::install.license_key_placeholder') }}"
                     required
                     :disabled="loading || verified"
                 >
                 <p class="text-sm text-gray-500 mt-2">
-                    You can find your license key in your purchase confirmation email or download package.
+                    {{ __('launchpad::install.license_key_help') }}
                 </p>
             </div>
 
@@ -105,13 +105,13 @@
                 :disabled="loading || !licenseKey.trim() || verified"
                 class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-                <span x-show="!loading">Verify License</span>
+                <span x-show="!loading">{{ __('launchpad::install.verify_license') }}</span>
                 <span x-show="loading" x-cloak class="flex items-center justify-center space-x-2">
                     <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span>Verifying...</span>
+                    <span>{{ __('launchpad::common.validating') }}</span>
                 </span>
             </button>
         </form>
@@ -145,14 +145,14 @@
         <div class="flex justify-between items-center pt-6 border-t mt-8">
             <a href="{{ route('launchpad.install.requirements') }}" 
                class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200">
-                ← Back
+                ← {{ __('launchpad::common.back') }}
             </a>
             
             <a x-show="verified" 
                href="{{ route('launchpad.install.database') }}" 
                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
                x-cloak>
-                Continue →
+                {{ __('launchpad::common.continue') }} →
             </a>
         </div>
     </div>

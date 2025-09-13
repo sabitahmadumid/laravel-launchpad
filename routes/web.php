@@ -2,7 +2,18 @@
 
 use Illuminate\Support\Facades\Route;
 use SabitAhmad\LaravelLaunchpad\Http\Controllers\InstallationController;
+use SabitAhmad\LaravelLaunchpad\Http\Controllers\LanguageController;
 use SabitAhmad\LaravelLaunchpad\Http\Controllers\UpdateController;
+
+// Language routes - Available for both installation and update
+Route::group([
+    'prefix' => 'launchpad',
+    'middleware' => ['web', 'set.language'],
+], function () {
+    Route::post('/language/switch', [LanguageController::class, 'switch'])->name('launchpad.language.switch');
+    Route::get('/language/available', [LanguageController::class, 'available'])->name('launchpad.language.available');
+    Route::get('/language/current', [LanguageController::class, 'current'])->name('launchpad.language.current');
+});
 
 // Installation Routes - Only load if installation is enabled
 if (config('launchpad.installation.enabled', false)) {
@@ -11,7 +22,7 @@ if (config('launchpad.installation.enabled', false)) {
         'middleware' => array_merge(
             ['ensure.file.session', 'ensure.file.cache'],
             config('launchpad.installation.route_middleware', ['web']),
-            ['redirect.if.installed']
+            ['set.language', 'redirect.if.installed']
         ),
     ], function () {
         // Welcome and Requirements - No license check needed
@@ -44,7 +55,10 @@ if (config('launchpad.installation.enabled', false)) {
 if (config('launchpad.update.enabled', false)) {
     Route::group([
         'prefix' => config('launchpad.update.route_prefix', 'update'),
-        'middleware' => config('launchpad.update.route_middleware', ['web']),
+        'middleware' => array_merge(
+            config('launchpad.update.route_middleware', ['web']),
+            ['set.language']
+        ),
     ], function () {
         // Welcome and Requirements - No license check needed
         Route::get('/', [UpdateController::class, 'welcome'])->name('launchpad.update.welcome');
