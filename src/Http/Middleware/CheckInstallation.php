@@ -15,7 +15,7 @@ class CheckInstallation
         $this->installationService = $installationService;
     }
 
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         if (! $this->installationService->isInstalled()) {
             return redirect()->route('launchpad.install.welcome');

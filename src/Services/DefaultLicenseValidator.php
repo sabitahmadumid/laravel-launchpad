@@ -19,6 +19,10 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
         $this->installationService = $installationService;
     }
 
+    /**
+     * @param array<string, mixed> $additionalData
+     * @return array<string, mixed>
+     */
     public function validate(string $licenseKey, array $additionalData = []): array
     {
         // NO CONFIG-BASED BYPASSES ALLOWED - Use LicenseService::isLicenseRequired() instead
@@ -43,6 +47,10 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
         }
     }
 
+    /**
+     * @param array<string, mixed> $additionalData
+     * @return array<string, mixed>
+     */
     protected function performValidation(string $licenseKey, array $additionalData): array
     {
         $serverUrl = config('launchpad.license.server_url');
@@ -102,8 +110,11 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
                 $lastException = $e;
 
                 // Don't retry on client errors (4xx)
-                if ($e->hasResponse() && $e->getResponse()->getStatusCode() >= 400 && $e->getResponse()->getStatusCode() < 500) {
-                    break;
+                if ($e->hasResponse()) {
+                    $response = $e->getResponse();
+                    if ($response && $response->getStatusCode() >= 400 && $response->getStatusCode() < 500) {
+                        break;
+                    }
                 }
 
                 // Wait before retry (exponential backoff)

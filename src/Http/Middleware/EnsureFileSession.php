@@ -15,7 +15,7 @@ class EnsureFileSession
         $this->installationService = $installationService;
     }
 
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         // Force file-based sessions during installation to avoid database dependency
         if (! $this->installationService->isInstalled()) {

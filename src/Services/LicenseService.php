@@ -62,6 +62,8 @@ class LicenseService
 
     /**
      * Validate license with the given key and automatically save to .env if valid
+     * @param array<string, mixed> $additionalData
+     * @return array<string, mixed>
      */
     public function validateLicense(string $licenseKey, array $additionalData = []): array
     {
@@ -106,6 +108,10 @@ class LicenseService
 
         try {
             $envContent = file_get_contents($envFile);
+            
+            if ($envContent === false) {
+                throw new \Exception('Could not read .env file');
+            }
 
             $key = 'LAUNCHPAD_LICENSE_KEY';
             $value = $licenseKey;
@@ -114,7 +120,11 @@ class LicenseService
 
             if (preg_match($pattern, $envContent)) {
                 // Update existing key
-                $envContent = preg_replace($pattern, $replacement, $envContent);
+                $updatedContent = preg_replace($pattern, $replacement, $envContent);
+                if ($updatedContent === null) {
+                    throw new \Exception('Failed to update license key in .env file');
+                }
+                $envContent = $updatedContent;
             } else {
                 // Add new key at the end
                 $envContent = rtrim($envContent)."\n\n# Laravel Launchpad License\n{$replacement}\n";
@@ -143,7 +153,7 @@ class LicenseService
     public function getLicenseKey(): ?string
     {
         // Try environment first
-        $envKey = env('LAUNCHPAD_LICENSE_KEY');
+        $envKey = config('launchpad.license.key');
         if ($envKey) {
             return $envKey;
         }
@@ -151,6 +161,10 @@ class LicenseService
         // Try storage file
         if (file_exists($this->licenseFile)) {
             $encrypted = file_get_contents($this->licenseFile);
+            
+            if ($encrypted === false) {
+                return null;
+            }
 
             return $this->decryptLicenseKey($encrypted);
         }
@@ -164,7 +178,7 @@ class LicenseService
     protected function storeLicenseKey(string $licenseKey): void
     {
         // Don't store if already in environment
-        if (env('LAUNCHPAD_LICENSE_KEY')) {
+        if (config('launchpad.license.key')) {
             return;
         }
 
@@ -201,7 +215,7 @@ class LicenseService
     protected function getSecureEnvironment(): string
     {
         // Check multiple sources to prevent easy tampering
-        $env1 = env('APP_ENV', 'production');
+        $env1 = config('app.env', 'production');
         $env2 = config('app.env', 'production');
         $env3 = app()->environment();
 
@@ -257,6 +271,11 @@ class LicenseService
 
         try {
             $encrypted = file_get_contents($flagFile);
+            
+            if ($encrypted === false) {
+                return false;
+            }
+            
             $decrypted = decrypt($encrypted);
 
             return $decrypted === 'enforce_license_locally';
@@ -308,6 +327,7 @@ class LicenseService
 
     /**
      * Get license status information
+     * @return array<string, mixed>
      */
     public function getLicenseStatus(): array
     {
@@ -323,7 +343,7 @@ class LicenseService
         }
 
         $isValid = $this->isLicenseVerified();
-        $source = env('LAUNCHPAD_LICENSE_KEY') ? 'environment' : 'storage';
+        $source = config('launchpad.license.key') ? 'environment' : 'storage';
 
         return [
             'has_license' => true,

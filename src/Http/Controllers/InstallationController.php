@@ -2,6 +2,8 @@
 
 namespace SabitAhmad\LaravelLaunchpad\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Artisan;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\View\View;
 use SabitAhmad\LaravelLaunchpad\Services\DatabaseService;
 use SabitAhmad\LaravelLaunchpad\Services\InstallationService;
 use SabitAhmad\LaravelLaunchpad\Services\LicenseService;
@@ -35,7 +38,7 @@ class InstallationController extends Controller
     /**
      * @return \Illuminate\View\View
      */
-    public function welcome()
+    public function welcome(): View
     {
         return view('launchpad::install.welcome');
     }
@@ -43,7 +46,7 @@ class InstallationController extends Controller
     /**
      * @return \Illuminate\View\View
      */
-    public function requirements()
+    public function requirements(): View
     {
         $requirements = $this->installationService->checkRequirements();
         $allMet = $this->installationService->allRequirementsMet();
@@ -51,7 +54,7 @@ class InstallationController extends Controller
         return view('launchpad::install.requirements', compact('requirements', 'allMet'));
     }
 
-    public function checkRequirements()
+    public function checkRequirements(): JsonResponse
     {
         $requirements = $this->installationService->checkRequirements();
         $allMet = $this->installationService->allRequirementsMet();
@@ -66,7 +69,7 @@ class InstallationController extends Controller
     /**
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function license()
+    public function license(): View|RedirectResponse
     {
         if (! $this->licenseService->isLicenseRequired()) {
             return redirect()->route('launchpad.install.database');
@@ -75,7 +78,7 @@ class InstallationController extends Controller
         return view('launchpad::install.license');
     }
 
-    public function verifyLicense(Request $request)
+    public function verifyLicense(Request $request): JsonResponse
     {
         if (! $this->licenseService->isLicenseRequired()) {
             return response()->json([
@@ -115,7 +118,7 @@ class InstallationController extends Controller
     /**
      * @return \Illuminate\View\View
      */
-    public function database()
+    public function database(): View
     {
         $supportedDrivers = config('launchpad.database.supported_drivers', ['mysql']);
         $importOptions = config('launchpad.database.import_options', []);
@@ -123,7 +126,7 @@ class InstallationController extends Controller
         return view('launchpad::install.database', compact('supportedDrivers', 'importOptions'));
     }
 
-    public function testDatabase(Request $request)
+    public function testDatabase(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'connection' => 'required|string',
@@ -158,7 +161,7 @@ class InstallationController extends Controller
         }
     }
 
-    public function setupDatabase(Request $request)
+    public function setupDatabase(Request $request): JsonResponse
     {
         try {
             // Validate that database connection was tested first
@@ -195,7 +198,7 @@ class InstallationController extends Controller
     /**
      * @return \Illuminate\View\View
      */
-    public function admin()
+    public function admin(): View
     {
         // Ensure language is properly initialized
         $languageService = app(\SabitAhmad\LaravelLaunchpad\Services\LanguageService::class);
@@ -207,7 +210,7 @@ class InstallationController extends Controller
         return view('launchpad::install.admin', compact('adminConfig', 'additionalFields', 'languageService'));
     }
 
-    public function createAdmin(Request $request)
+    public function createAdmin(Request $request): JsonResponse
     {
         $adminConfig = config('launchpad.admin', []);
         $additionalFields = config('launchpad.additional_fields', []);
@@ -260,14 +263,14 @@ class InstallationController extends Controller
     /**
      * @return \Illuminate\View\View
      */
-    public function final()
+    public function final(): View
     {
         $databaseOptions = config('launchpad.database.import_options', []);
 
         return view('launchpad::install.final', compact('databaseOptions'));
     }
 
-    public function complete(Request $request)
+    public function complete(Request $request): JsonResponse
     {
         try {
             // Validate that we can proceed with installation
@@ -307,7 +310,7 @@ class InstallationController extends Controller
     /**
      * @return \Illuminate\View\View
      */
-    public function success()
+    public function success(): View
     {
         $redirectUrl = config('launchpad.post_install.redirect_url', '/admin');
 

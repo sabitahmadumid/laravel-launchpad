@@ -2,12 +2,15 @@
 
 namespace SabitAhmad\LaravelLaunchpad\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 use SabitAhmad\LaravelLaunchpad\Services\DatabaseService;
 use SabitAhmad\LaravelLaunchpad\Services\InstallationService;
 use SabitAhmad\LaravelLaunchpad\Services\LicenseService;
@@ -33,7 +36,7 @@ class UpdateController extends Controller
     /**
      * @return \Illuminate\View\View
      */
-    public function welcome()
+    public function welcome(): View
     {
         $currentVersion = $this->getCurrentVersion();
         $newVersion = config('launchpad.update.current_version', '1.0.0');
@@ -44,7 +47,7 @@ class UpdateController extends Controller
     /**
      * @return \Illuminate\View\View
      */
-    public function requirements()
+    public function requirements(): View
     {
         $requirements = $this->installationService->checkRequirements();
         $allMet = $this->installationService->allRequirementsMet();
@@ -52,7 +55,7 @@ class UpdateController extends Controller
         return view('launchpad::update.requirements', compact('requirements', 'allMet'));
     }
 
-    public function checkRequirements()
+    public function checkRequirements(): JsonResponse
     {
         $requirements = $this->installationService->checkRequirements();
         $allMet = $this->installationService->allRequirementsMet();
@@ -67,7 +70,7 @@ class UpdateController extends Controller
     /**
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function license()
+    public function license(): View|RedirectResponse
     {
         if (! $this->licenseService->isLicenseRequired()) {
             return redirect()->route('launchpad.update.update');
@@ -76,7 +79,7 @@ class UpdateController extends Controller
         return view('launchpad::update.license');
     }
 
-    public function verifyLicense(Request $request)
+    public function verifyLicense(Request $request): JsonResponse
     {
         if (! $this->licenseService->isLicenseRequired()) {
             return response()->json([
@@ -116,7 +119,7 @@ class UpdateController extends Controller
     /**
      * @return \Illuminate\View\View
      */
-    public function update()
+    public function update(): View
     {
         $updateOptions = config('launchpad.update_options', []);
         $currentVersion = $this->getCurrentVersion();
@@ -125,7 +128,7 @@ class UpdateController extends Controller
         return view('launchpad::update.update', compact('updateOptions', 'currentVersion', 'newVersion'));
     }
 
-    public function runUpdate(Request $request)
+    public function runUpdate(Request $request): JsonResponse
     {
         try {
             // Clear config cache first to ensure fresh config reading
@@ -183,7 +186,7 @@ class UpdateController extends Controller
     /**
      * @return \Illuminate\View\View
      */
-    public function success()
+    public function success(): View
     {
         $newVersion = config('launchpad.update.current_version', '1.0.0');
 

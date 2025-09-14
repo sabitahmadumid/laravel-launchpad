@@ -44,6 +44,8 @@ class FieldTranslator
 
     /**
      * Translate field configuration array
+     * @param array<string, mixed> $fieldConfig
+     * @return array<string, mixed>
      */
     public static function translateFieldConfig(array $fieldConfig): array
     {

@@ -22,10 +22,16 @@ class InstallationService
             File::makeDirectory($directory, 0755, true);
         }
 
-        File::put($completedFile, json_encode([
+        $content = json_encode([
             'installed_at' => now()->toISOString(),
             'version' => config('launchpad.update.current_version', '1.0.0'),
-        ]));
+        ]);
+        
+        if ($content === false) {
+            throw new \Exception('Failed to encode installation data');
+        }
+
+        File::put($completedFile, $content);
     }
 
     public function resetInstallation(): void
@@ -37,6 +43,9 @@ class InstallationService
         }
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getInstallationData(): ?array
     {
         $completedFile = config('launchpad.installation.completed_file');
@@ -50,6 +59,9 @@ class InstallationService
         return json_decode($content, true);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function checkRequirements(): array
     {
         $requirements = config('launchpad.requirements', []);
@@ -78,6 +90,10 @@ class InstallationService
         return $results;
     }
 
+    /**
+     * @param array<string, mixed> $phpConfig
+     * @return array<string, mixed>
+     */
     protected function checkPhpVersion(array $phpConfig): array
     {
         $currentVersion = PHP_VERSION;
@@ -93,6 +109,10 @@ class InstallationService
         ];
     }
 
+    /**
+     * @param array<string, mixed> $extensionsConfig
+     * @return array<string, mixed>
+     */
     protected function checkExtensions(array $extensionsConfig): array
     {
         $results = [
@@ -111,6 +131,10 @@ class InstallationService
         return $results;
     }
 
+    /**
+     * @param array<string, mixed> $directoriesConfig
+     * @return array<string, mixed>
+     */
     protected function checkDirectories(array $directoriesConfig): array
     {
         $results = [];
@@ -130,6 +154,10 @@ class InstallationService
         return $results;
     }
 
+    /**
+     * @param array<string, mixed> $functionsConfig
+     * @return array<string, mixed>
+     */
     protected function checkFunctions(array $functionsConfig): array
     {
         $results = [];
