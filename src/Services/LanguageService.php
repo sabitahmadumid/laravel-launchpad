@@ -32,6 +32,7 @@ class LanguageService
 
     /**
      * Get available languages
+     *
      * @return array<string, array<string, mixed>>
      */
     public function getAvailableLanguages(): array
@@ -91,6 +92,7 @@ class LanguageService
 
     /**
      * Get language info
+     *
      * @return array<string, mixed>|null
      */
     public function getLanguageInfo(?string $language = null): ?array
@@ -136,7 +138,8 @@ class LanguageService
 
     /**
      * Get translated string with fallback
-     * @param array<string, mixed> $replace
+     *
+     * @param  array<string, mixed>  $replace
      */
     public function trans(string $key, array $replace = [], ?string $locale = null): string
     {

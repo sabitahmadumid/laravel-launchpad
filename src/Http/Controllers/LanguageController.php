@@ -19,8 +19,6 @@ class LanguageController extends Controller
 
     /**
      * Switch language
-     *
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function switch(Request $request): JsonResponse|RedirectResponse
     {
@@ -69,8 +67,6 @@ class LanguageController extends Controller
 
     /**
      * Get available languages
-     *
-     * @return \Illuminate\Http\JsonResponse
      */
     public function available(): JsonResponse
     {
@@ -83,8 +79,6 @@ class LanguageController extends Controller
 
     /**
      * Get current language info
-     *
-     * @return \Illuminate\Http\JsonResponse
      */
     public function current(): JsonResponse
     {

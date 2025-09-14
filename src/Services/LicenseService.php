@@ -62,7 +62,8 @@ class LicenseService
 
     /**
      * Validate license with the given key and automatically save to .env if valid
-     * @param array<string, mixed> $additionalData
+     *
+     * @param  array<string, mixed>  $additionalData
      * @return array<string, mixed>
      */
     public function validateLicense(string $licenseKey, array $additionalData = []): array
@@ -108,7 +109,7 @@ class LicenseService
 
         try {
             $envContent = file_get_contents($envFile);
-            
+
             if ($envContent === false) {
                 throw new \Exception('Could not read .env file');
             }
@@ -161,7 +162,7 @@ class LicenseService
         // Try storage file
         if (file_exists($this->licenseFile)) {
             $encrypted = file_get_contents($this->licenseFile);
-            
+
             if ($encrypted === false) {
                 return null;
             }
@@ -271,11 +272,11 @@ class LicenseService
 
         try {
             $encrypted = file_get_contents($flagFile);
-            
+
             if ($encrypted === false) {
                 return false;
             }
-            
+
             $decrypted = decrypt($encrypted);
 
             return $decrypted === 'enforce_license_locally';
@@ -327,6 +328,7 @@ class LicenseService
 
     /**
      * Get license status information
+     *
      * @return array<string, mixed>
      */
     public function getLicenseStatus(): array
