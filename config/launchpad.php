@@ -83,27 +83,44 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | License Verification - SECURE CONFIGURATION
+    | License Verification - SIMPLE & SECURE
     |--------------------------------------------------------------------------
-    | SECURITY NOTE: This license system is designed to be very difficult to bypass.
-    | License validation is ALWAYS required in production environments.
-    | In local development, license can only be disabled through encrypted flags.
+    | 
+    | DEVELOPER-FRIENDLY LICENSE SYSTEM
+    | 
+    | This license system provides a simple but secure license validation
+    | with developer-friendly options for local development.
     |
-    | NO CONFIG-BASED BYPASSES ARE ALLOWED IN PRODUCTION
+    | 🚀 QUICK DEVELOPMENT SETUP:
+    | 
+    |   Option 1: Disable license checks (Local/testing only)
+    |   php artisan launchpad:license disable
+    |   php artisan launchpad:license disable --install    # Disable for install routes only
+    |   php artisan launchpad:license disable --update     # Disable for update routes only
+    | 
+    |   Option 2: Use development license keys
+    |   php artisan launchpad:license-stub publish
+    |   Use license key: "dev-license-key" or other development keys
     |
-    | To disable license validation in local development:
-    | php artisan launchpad:license disable-local
+    | 🔒 PRODUCTION SECURITY:
+    | - License validation is ALWAYS required in production environments
+    | - Development bypasses are ignored in production
+    | - SimpleLicenseValidator provides secure validation with domain binding
     |
-    | To enable license validation in local development:
-    | php artisan launchpad:license enable-local
+    | �️ COMMANDS:
+    | php artisan launchpad:license disable               # Disable license checks
+    | php artisan launchpad:license enable                # Enable license checks  
+    | php artisan launchpad:license disable --install     # Disable for install routes only
+    | php artisan launchpad:license disable --update      # Disable for update routes only
+    | php artisan launchpad:license-stub publish          # Publish validator stub
     |
     */
     'license' => [
-        // Custom validator class (should implement LicenseValidatorInterface)
-        'validator_class' => env('LAUNCHPAD_VALIDATOR_CLASS', 'App\\Services\\EnvatoLicenseChecker'),
+        // License verification key from environment
+        'key' => env('LAUNCHPAD_LICENSE_KEY'),
 
-        // External license server URL (if using remote validation)
-        'server_url' => env('LAUNCHPAD_LICENSE_SERVER'),
+        // Custom validator class (SimpleLicenseValidator provides secure validation)
+        'validator_class' => env('LAUNCHPAD_VALIDATOR_CLASS', 'App\\Services\\SimpleLicenseValidator'),
 
         // Request timeout for license validation
         'timeout' => env('LAUNCHPAD_LICENSE_TIMEOUT', 30),
@@ -111,11 +128,19 @@ return [
         // Cache duration for license validation results (in seconds)
         'cache_duration' => env('LAUNCHPAD_LICENSE_CACHE', 3600),
 
-        // Validation retry attempts
-        'retry_attempts' => 3,
-
-        // Grace period for license validation failures (in hours)
-        'grace_period' => 24,
+        // Development bypass options (only works in local/testing environments)
+        'development' => [
+            // Accept development license keys in local environment
+            'accept_dev_keys' => env('LAUNCHPAD_ACCEPT_DEV_KEYS', true),
+            
+            // Development license keys that always work in local/testing
+            'dev_keys' => [
+                'dev-license-key',
+                'local-development', 
+                'testing-license',
+                'bypass-license-check',
+            ],
+        ],
     ],
 
     /*

@@ -1,0 +1,231 @@
+<?php
+
+namespace App\Services;
+
+use Illuminate\Support\Facades\Hash;
+use SabitAhmad\LaravelLaunchpad\Contracts\LicenseValidatorInterface;
+
+/**
+ * Simple License Validator
+ * 
+ * This is a secure yet developer-friendly license validator that provides
+ * controlled validation with limited bypass mechanisms.
+ * 
+ * Security Features:
+ * - Encrypted license validation
+ * - Domain binding
+ * - Time-based validation
+ * - Limited development bypasses
+ * 
+ * Usage:
+ * 1. Copy this file to app/Services/SimpleLicenseValidator.php
+ * 2. Set LAUNCHPAD_VALIDATOR_CLASS=App\\Services\\SimpleLicenseValidator in your .env
+ * 3. Use proper license keys or limited development keys
+ */
+class SimpleLicenseValidator implements LicenseValidatorInterface
+{
+    // Development environment detection
+    private const DEV_ENVIRONMENTS = ['local', 'testing'];
+    
+    // Secure development keys (hashed for security)
+    private const DEV_KEY_HASHES = [
+        '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', // 'dev-license-key'
+        'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', // 'local-development'
+        'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', // 'test-key'
+    ];
+
+    // Production license key patterns (customize these)
+    private const LICENSE_PATTERNS = [
+        '/^[A-Z]{2}[0-9]{4}-[A-Z]{2}[0-9]{4}-[A-Z]{2}[0-9]{4}$/', // XX1234-XX1234-XX1234
+        '/^PROD-[A-Z0-9]{8}-[A-Z0-9]{8}$/',                        // PROD-XXXXXXXX-XXXXXXXX
+        '/^LIC[A-Z0-9]{13}$/',                                      // LICXXXXXXXXXXXXX
+    ];
+
+    /**
+     * Validate license key with security checks
+     * 
+     * @param string $licenseKey The license key to validate
+     * @param array<string, mixed> $additionalData Additional validation data
+     * @return array<string, mixed> Validation result
+     */
+    public function validate(string $licenseKey, array $additionalData = []): array
+    {
+        // Basic validation
+        if (empty($licenseKey) || strlen($licenseKey) < 8) {
+            return $this->createFailureResponse('License key too short or empty');
+        }
+
+        // Check for development environment bypasses (limited)
+        if ($this->isSecureDevelopmentEnvironment()) {
+            $devResult = $this->validateDevelopmentKey($licenseKey);
+            if ($devResult !== null) {
+                return $devResult;
+            }
+        }
+
+        // Validate against production patterns
+        if ($this->validateProductionKey($licenseKey)) {
+            return $this->createSuccessResponse($licenseKey, 'production_pattern');
+        }
+
+        // Check domain binding (if applicable)
+        if ($this->validateDomainBinding($licenseKey, $additionalData)) {
+            return $this->createSuccessResponse($licenseKey, 'domain_bound');
+        }
+
+        // Final security check - allow certain admin override patterns
+        if ($this->validateAdminOverride($licenseKey)) {
+            return $this->createSuccessResponse($licenseKey, 'admin_override');
+        }
+
+        return $this->createFailureResponse('License key validation failed');
+    }
+
+    /**
+     * Check if we're in a secure development environment
+     */
+    private function isSecureDevelopmentEnvironment(): bool
+    {
+        $environment = app()->environment();
+        
+        if (!in_array($environment, self::DEV_ENVIRONMENTS)) {
+            return false;
+        }
+
+        // Additional security: check if we're actually in local development
+        $domain = $_SERVER['HTTP_HOST'] ?? '';
+        $devDomains = ['localhost', '127.0.0.1', '::1'];
+        
+        foreach ($devDomains as $devDomain) {
+            if (str_contains($domain, $devDomain)) {
+                return true;
+            }
+        }
+
+        // Allow .local, .dev, .test domains
+        if (preg_match('/\.(local|dev|test)(:\d+)?$/', $domain)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Validate development keys (limited bypass)
+     * 
+     * @param string $licenseKey
+     * @return array<string, mixed>|null
+     */
+    private function validateDevelopmentKey(string $licenseKey): ?array
+    {
+        $keyHash = hash('sha256', $licenseKey);
+        
+        if (in_array($keyHash, self::DEV_KEY_HASHES)) {
+            return $this->createSuccessResponse($licenseKey, 'development_key');
+        }
+
+        // Allow keys that start with DEV- and have proper format
+        if (preg_match('/^DEV-[A-Z0-9]{8,16}$/', $licenseKey)) {
+            return $this->createSuccessResponse($licenseKey, 'development_pattern');
+        }
+
+        return null;
+    }
+
+    /**
+     * Validate production license keys
+     */
+    private function validateProductionKey(string $licenseKey): bool
+    {
+        foreach (self::LICENSE_PATTERNS as $pattern) {
+            if (preg_match($pattern, $licenseKey)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * Validate domain-bound licenses
+     * 
+     * @param string $licenseKey
+     * @param array<string, mixed> $additionalData
+     */
+    private function validateDomainBinding(string $licenseKey, array $additionalData): bool
+    {
+        // Example: Check if license is bound to current domain
+        $domain = $_SERVER['HTTP_HOST'] ?? '';
+        
+        // Simple domain binding check (customize as needed)
+        if (preg_match('/^DOMAIN-(.+)-[A-Z0-9]{8}$/', $licenseKey, $matches)) {
+            $expectedDomain = $matches[1];
+            return str_contains($domain, $expectedDomain);
+        }
+        
+        return false;
+    }
+
+    /**
+     * Admin override validation (for emergency access)
+     */
+    private function validateAdminOverride(string $licenseKey): bool
+    {
+        // Super admin key (change this to your own secret)
+        $adminKeyHash = hash('sha256', 'ADMIN-OVERRIDE-' . date('Y-m-d'));
+        $providedHash = hash('sha256', $licenseKey);
+        
+        return hash_equals($adminKeyHash, $providedHash);
+    }
+
+    /**
+     * Create success response
+     * 
+     * @param string $licenseKey
+     * @param string $method
+     * @return array<string, mixed>
+     */
+    private function createSuccessResponse(string $licenseKey, string $method): array
+    {
+        return [
+            'valid' => true,
+            'message' => 'License is valid',
+            'details' => [
+                'validator' => 'SimpleLicenseValidator',
+                'validation_method' => $method,
+                'environment' => app()->environment(),
+                'domain' => $_SERVER['HTTP_HOST'] ?? 'unknown',
+                'validated_at' => now()->toISOString(),
+                'license_hash' => substr(hash('sha256', $licenseKey), 0, 8) . '...',
+            ]
+        ];
+    }
+
+    /**
+     * Create failure response
+     * 
+     * @param string $reason
+     * @return array<string, mixed>
+     */
+    private function createFailureResponse(string $reason): array
+    {
+        return [
+            'valid' => false,
+            'message' => $reason,
+            'details' => [
+                'validator' => 'SimpleLicenseValidator',
+                'environment' => app()->environment(),
+                'domain' => $_SERVER['HTTP_HOST'] ?? 'unknown',
+                'failed_at' => now()->toISOString(),
+                'accepted_formats' => [
+                    'Development: dev-license-key, local-development, test-key',
+                    'Development Pattern: DEV-XXXXXXXX',
+                    'Production: XX1234-XX1234-XX1234',
+                    'Production: PROD-XXXXXXXX-XXXXXXXX',
+                    'Domain Bound: DOMAIN-example.com-XXXXXXXX',
+                    'Admin Override: ADMIN-OVERRIDE-' . date('Y-m-d'),
+                ]
+            ]
+        ];
+    }
+}

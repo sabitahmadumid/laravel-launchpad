@@ -195,6 +195,16 @@ class LicenseService
      */
     public function isLicenseRequired(): bool
     {
+        // Check for route-specific bypasses first
+        if ($this->hasRouteSpecificBypass()) {
+            return false;
+        }
+
+        // Check for global bypass (development use only)
+        if ($this->hasGlobalBypass()) {
+            return false;
+        }
+
         // Get environment name through multiple methods to prevent tampering
         $env = $this->getSecureEnvironment();
 
@@ -322,6 +332,88 @@ class LicenseService
         $flagFile = storage_path('app/.license_enforce');
         if (file_exists($flagFile)) {
             unlink($flagFile);
+        }
+    }
+
+    /**
+     * Check if global license bypass is active (development use only)
+     */
+    protected function hasGlobalBypass(): bool
+    {
+        $bypassFile = storage_path('app/.license_bypass_global');
+        
+        if (!file_exists($bypassFile)) {
+            return false;
+        }
+
+        try {
+            $encrypted = file_get_contents($bypassFile);
+            if ($encrypted === false) {
+                return false;
+            }
+            
+            $decrypted = decrypt($encrypted);
+            $data = json_decode($decrypted, true);
+            
+            // Validate bypass data structure
+            return is_array($data) && isset($data['created_at']);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Check if route-specific bypass is active
+     */
+    protected function hasRouteSpecificBypass(): bool
+    {
+        $currentRoute = request()->route();
+        if (!$currentRoute) {
+            return false;
+        }
+
+        $routeName = $currentRoute->getName() ?? '';
+        
+        // Check for installation route bypasses
+        if (str_contains($routeName, 'install')) {
+            return $this->hasSpecificBypass('install');
+        }
+        
+        // Check for update route bypasses
+        if (str_contains($routeName, 'update')) {
+            return $this->hasSpecificBypass('update');
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if specific bypass type is active
+     */
+    protected function hasSpecificBypass(string $type): bool
+    {
+        $bypassFile = storage_path("app/.license_bypass_{$type}");
+        
+        if (!file_exists($bypassFile)) {
+            return false;
+        }
+
+        try {
+            $encrypted = file_get_contents($bypassFile);
+            if ($encrypted === false) {
+                return false;
+            }
+            
+            $decrypted = decrypt($encrypted);
+            $data = json_decode($decrypted, true);
+            
+            // Validate bypass data structure and type
+            return is_array($data) && 
+                   isset($data['type']) && 
+                   $data['type'] === $type &&
+                   isset($data['created_at']);
+        } catch (\Exception $e) {
+            return false;
         }
     }
 

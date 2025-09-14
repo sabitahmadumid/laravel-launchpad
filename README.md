@@ -1,8 +1,6 @@
 # 🚀 Laravel Launchpad
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/sabitahmadumid/laravel-launchpad.svg?style=flat-square)](https://packagist.org/packages/sabitahmadumid/laravel-launchpad)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/sabitahmadumid/laravel-launchpad/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/sabitahmadumid/laravel-launchpad/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/sabitahmadumid/laravel-launchpad/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/sabitahmadumid/laravel-launchpad/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/sabitahmadumid/laravel-launchpad.svg?style=flat-square)](https://packagist.org/packages/sabitahmadumid/laravel-launchpad)
 
 **Laravel Launchpad** is a comprehensive installation and update wizard package that makes it incredibly easy for developers to ship their Laravel applications and for end-users to install them. With professional UI components, license validation, environment checking, and a streamlined automatic process, Launchpad transforms complex deployments into simple, guided experiences.
@@ -195,6 +193,281 @@ GET /launchpad/language/available
 GET /launchpad/language/current
 ```
 
+## 🔒 License System
+
+Laravel Launchpad includes a simple but secure license validation system designed to be developer-friendly while preventing easy bypassing.
+
+### Quick Setup
+
+1. **Publish the license validator:**
+   ```bash
+   php artisan launchpad:license-stub
+   ```
+
+2. **Configure your environment:**
+   ```env
+   LAUNCHPAD_VALIDATOR_CLASS=App\Services\SimpleLicenseValidator
+   LAUNCHPAD_LICENSE_KEY=your-license-key
+   ```
+
+3. **For development, disable license checks:**
+   ```bash
+   php artisan launchpad:license disable
+   ```
+
+### License Commands
+
+```bash
+# Disable license validation (development)
+php artisan launchpad:license disable
+
+# Enable license validation
+php artisan launchpad:license enable
+
+# Disable only for installation routes
+php artisan launchpad:license disable --install
+
+# Disable only for update routes  
+php artisan launchpad:license disable --update
+
+# Force disable (ignore confirmations)
+php artisan launchpad:license disable --force
+
+# Publish validator stub
+php artisan launchpad:license-stub
+```
+
+### Development License Keys
+
+For local development, these keys work automatically:
+- `dev-license-key`
+- `local-development`
+- `testing-license`
+- `bypass-license-check`
+
+### Custom License Validators
+
+#### Envato CodeCanyon Integration
+
+Create a custom validator for Envato CodeCanyon products:
+
+```php
+<?php
+
+namespace App\Services;
+
+use SabitAhmad\LaravelLaunchpad\Contracts\LicenseValidatorInterface;
+use Illuminate\Support\Facades\Http;
+
+class EnvatoLicenseValidator implements LicenseValidatorInterface
+{
+    public function validate(string $licenseKey, array $options = []): array
+    {
+        // Development bypass for local testing
+        if (app()->environment(['local', 'testing'])) {
+            $devKeys = ['ENVATO-DEV-BYPASS', 'dev-license-key', 'envato-test-key'];
+            if (in_array($licenseKey, $devKeys)) {
+                return [
+                    'valid' => true, 
+                    'message' => 'Development license bypass'
+                ];
+            }
+        }
+
+        // Validate with Envato API
+        try {
+            $response = $this->validateWithEnvato($licenseKey);
+            
+            if ($response['valid']) {
+                return [
+                    'valid' => true,
+                    'message' => 'Valid Envato purchase code',
+                    'data' => $response['data']
+                ];
+            }
+
+            return [
+                'valid' => false,
+                'message' => $response['message'] ?? 'Invalid Envato purchase code'
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'valid' => false,
+                'message' => 'Envato validation error: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    private function validateWithEnvato(string $purchaseCode): array
+    {
+        $token = config('services.envato.token');
+        
+        if (!$token) {
+            throw new \Exception('Envato API token not configured');
+        }
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+            'User-Agent' => config('app.name', 'Laravel Application')
+        ])->timeout(30)->get("https://api.envato.com/v3/market/author/sale?code={$purchaseCode}");
+
+        if ($response->successful()) {
+            $data = $response->json();
+            return [
+                'valid' => true, 
+                'data' => [
+                    'item_id' => $data['item']['id'] ?? null,
+                    'item_name' => $data['item']['name'] ?? null,
+                    'buyer' => $data['buyer'] ?? null,
+                    'purchase_date' => $data['sold_at'] ?? null,
+                ]
+            ];
+        }
+
+        $error = $response->json();
+        return [
+            'valid' => false, 
+            'message' => $error['description'] ?? 'Invalid purchase code'
+        ];
+    }
+}
+```
+
+**Environment Configuration for Envato:**
+```env
+# Envato Integration
+LAUNCHPAD_VALIDATOR_CLASS=App\Services\EnvatoLicenseValidator
+ENVATO_API_TOKEN=your-envato-api-token
+
+# License Configuration
+LAUNCHPAD_LICENSE_KEY=your-envato-purchase-code
+LAUNCHPAD_LICENSE_TIMEOUT=30
+LAUNCHPAD_ACCEPT_DEV_KEYS=true
+```
+
+#### Custom License Server Integration
+
+Create a validator that connects to your own license server:
+
+```php
+<?php
+
+namespace App\Services;
+
+use SabitAhmad\LaravelLaunchpad\Contracts\LicenseValidatorInterface;
+use Illuminate\Support\Facades\Http;
+
+class CustomServerLicenseValidator implements LicenseValidatorInterface
+{
+    public function validate(string $licenseKey, array $options = []): array
+    {
+        // Development bypass
+        if (app()->environment(['local', 'testing'])) {
+            $devKeys = ['CUSTOM-DEV-KEY', 'dev-license-key', 'server-test-key'];
+            if (in_array($licenseKey, $devKeys)) {
+                return [
+                    'valid' => true, 
+                    'message' => 'Development license bypass'
+                ];
+            }
+        }
+
+        $serverUrl = config('launchpad.license.server_url');
+        
+        if (!$serverUrl) {
+            return [
+                'valid' => false,
+                'message' => 'License server URL not configured'
+            ];
+        }
+
+        try {
+            $response = Http::timeout(30)->post($serverUrl, [
+                'license_key' => $licenseKey,
+                'domain' => request()->getHost(),
+                'product' => config('app.name'),
+                'version' => config('launchpad.update.current_version'),
+                'ip' => request()->ip(),
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                
+                return [
+                    'valid' => $data['valid'] ?? false,
+                    'message' => $data['message'] ?? 'License validation completed',
+                    'data' => $data['license_data'] ?? []
+                ];
+            }
+
+            return [
+                'valid' => false,
+                'message' => 'License server error: HTTP ' . $response->status()
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'valid' => false,
+                'message' => 'Connection error: ' . $e->getMessage()
+            ];
+        }
+    }
+}
+```
+
+**Environment Configuration for Custom Server:**
+```env
+# Custom License Server
+LAUNCHPAD_VALIDATOR_CLASS=App\Services\CustomServerLicenseValidator
+LAUNCHPAD_LICENSE_SERVER=https://your-license-server.com/api/validate
+
+# License Configuration
+LAUNCHPAD_LICENSE_KEY=your-license-key
+LAUNCHPAD_LICENSE_TIMEOUT=30
+LAUNCHPAD_ACCEPT_DEV_KEYS=true
+```
+
+**Example License Server Response:**
+```json
+{
+  "valid": true,
+  "message": "License is valid",
+  "license_data": {
+    "type": "standard",
+    "expires_at": "2024-12-31",
+    "max_domains": 1,
+    "features": ["installation", "updates", "support"]
+  }
+}
+```
+
+### Environment Configuration
+
+```env
+# License Configuration
+LAUNCHPAD_VALIDATOR_CLASS=App\Services\SimpleLicenseValidator
+LAUNCHPAD_LICENSE_KEY=your-license-key
+LAUNCHPAD_LICENSE_TIMEOUT=30
+LAUNCHPAD_LICENSE_CACHE=3600
+LAUNCHPAD_ACCEPT_DEV_KEYS=true
+
+# For Envato Integration
+ENVATO_API_TOKEN=your-envato-api-token
+
+# For Custom Server
+LAUNCHPAD_LICENSE_SERVER=https://your-license-server.com/api/validate
+```
+
+### License System Features
+
+- **🔒 Secure by Default** - Hard to bypass for normal users
+- **👨‍💻 Developer Friendly** - Easy disable options and development keys
+- **🎛️ Route-Specific Control** - Disable license checks for specific routes
+- **🔄 Flexible Validation** - Support for multiple license server types
+- **💾 Encrypted Storage** - Secure bypass file storage
+- **🌍 Domain Binding** - License validation tied to specific domains
+
 ## ⚙️ Configuration
 
 The package comes with a comprehensive configuration file located at `config/launchpad.php`. Most settings can be controlled via environment variables for better security and deployment management.
@@ -219,15 +492,28 @@ return [
     ],
     
     'license' => [
-        // License requirement is primarily controlled by environment variables
-        'enabled' => env('LAUNCHPAD_LICENSE_ENABLED', true),
-        'enforce_local' => env('LAUNCHPAD_ENFORCE_LOCAL', false),
-        'validator_class' => env('LAUNCHPAD_VALIDATOR_CLASS', 'App\\Services\\EnvatoLicenseChecker'),
-        'server_url' => env('LAUNCHPAD_LICENSE_SERVER'),
+        // License key from environment
+        'key' => env('LAUNCHPAD_LICENSE_KEY'),
+        
+        // Custom validator class (SimpleLicenseValidator is recommended)
+        'validator_class' => env('LAUNCHPAD_VALIDATOR_CLASS', 'App\\Services\\SimpleLicenseValidator'),
+        
+        // Request timeout for license validation
         'timeout' => env('LAUNCHPAD_LICENSE_TIMEOUT', 30),
+        
+        // Cache duration for license validation results (in seconds)
         'cache_duration' => env('LAUNCHPAD_LICENSE_CACHE', 3600),
-        'retry_attempts' => 3,
-        'grace_period' => 24, // hours
+        
+        // Development bypass options (only works in local/testing environments)
+        'development' => [
+            'accept_dev_keys' => env('LAUNCHPAD_ACCEPT_DEV_KEYS', true),
+            'dev_keys' => [
+                'dev-license-key',
+                'local-development', 
+                'testing-license',
+                'bypass-license-check',
+            ],
+        ],
     ],
     
     'ui' => [
@@ -1142,25 +1428,6 @@ LAUNCHPAD_LICENSE_KEY=manually-added-key
 5. **Grace period configuration** - Allow temporary server outages
 6. **Log license events** - Track validation attempts and failures
 
-## 🧪 Testing
-
-Run the package tests:
-
-```bash
-composer test
-```
-
-Run tests with coverage:
-
-```bash
-composer test:coverage
-```
-
-Run static analysis:
-
-```bash
-composer analyse
-```
 
 ## 📝 Changelog
 
