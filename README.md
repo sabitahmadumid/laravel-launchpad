@@ -217,6 +217,7 @@ Laravel Launchpad includes a simple but secure license validation system designe
 
 ### License Commands
 
+#### Basic License Management
 ```bash
 # Disable license validation (development)
 php artisan launchpad:license disable
@@ -236,6 +237,38 @@ php artisan launchpad:license disable --force
 # Publish validator stub
 php artisan launchpad:license-stub
 ```
+
+#### Advanced License Management
+```bash
+# Check license status
+php artisan launchpad:license status
+
+# Manually verify license key
+php artisan launchpad:license verify
+
+# Verify with specific key (will auto-save to .env if valid)
+php artisan launchpad:license verify --key=your-license-key
+
+# Remove stored license
+php artisan launchpad:license remove
+
+# Force remove without confirmation
+php artisan launchpad:license remove --force
+
+# Clear license cache
+php artisan launchpad:license clear-cache
+```
+
+#### Local Development Commands
+```bash
+# Enable license enforcement in local environment
+php artisan launchpad:license enable-local
+
+# Disable license enforcement in local environment  
+php artisan launchpad:license disable-local
+```
+
+**Note**: Local enforcement commands only work in local development environment and use encrypted flags for security.
 
 ### Development License Keys
 
@@ -1250,49 +1283,6 @@ LAUNCHPAD_LICENSE_CACHE=3600
 
 **IMPORTANT SECURITY NOTICE**: License validation **cannot be disabled via configuration** in production environments. This is by design to prevent easy bypassing.
 
-### 🎛️ Command Line Management
-
-Laravel Launchpad includes a powerful command-line interface for license management:
-
-#### Check License Status
-```bash
-php artisan launchpad:license status
-```
-
-#### Manually Verify License Key
-```bash
-# Interactive mode (will automatically save to .env if valid)
-php artisan launchpad:license verify
-
-# With key parameter (will automatically save to .env if valid)
-php artisan launchpad:license verify --key=your-license-key
-```
-
-#### Remove Stored License
-```bash
-# With confirmation
-php artisan launchpad:license remove
-
-# Force removal without confirmation
-php artisan launchpad:license remove --force
-```
-
-#### Clear License Cache
-```bash
-php artisan launchpad:license clear-cache
-```
-
-#### Local Development License Management
-```bash
-# Enable license enforcement in local environment
-php artisan launchpad:license enable-local
-
-# Disable license enforcement in local environment  
-php artisan launchpad:license disable-local
-```
-
-**Note**: Local enforcement commands only work in local development environment and use encrypted flags for security.
-
 ### 📊 Detailed License Information
 
 For more detailed license information in your application:
@@ -1379,7 +1369,7 @@ LAUNCHPAD_VALIDATOR_CLASS=App\\Services\\CustomLicenseValidator
 
 #### License Not Found After Installation
 ```bash
-# Check current status
+# Check current status (see License Commands section for all options)
 php artisan launchpad:license status
 
 # If needed, manually verify (will auto-save to .env)
@@ -1388,7 +1378,7 @@ php artisan launchpad:license verify
 
 #### Validation Failures
 ```bash
-# Clear cache and retry
+# Clear cache and retry (see License Commands section for all options)
 php artisan launchpad:license clear-cache
 
 # Check if license exists in environment
