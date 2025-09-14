@@ -2,6 +2,8 @@
 
 namespace SabitAhmad\LaravelLaunchpad\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use SabitAhmad\LaravelLaunchpad\Services\LanguageService;
@@ -17,10 +19,8 @@ class LanguageController extends Controller
 
     /**
      * Switch language
-     *
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
-    public function switch(Request $request)
+    public function switch(Request $request): JsonResponse|RedirectResponse
     {
         $language = $request->get('language');
 
@@ -67,10 +67,8 @@ class LanguageController extends Controller
 
     /**
      * Get available languages
-     *
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function available()
+    public function available(): JsonResponse
     {
         return response()->json([
             'languages' => $this->languageService->getAvailableLanguages(),
@@ -81,10 +79,8 @@ class LanguageController extends Controller
 
     /**
      * Get current language info
-     *
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function current()
+    public function current(): JsonResponse
     {
         $currentLanguage = $this->languageService->getCurrentLanguage();
 

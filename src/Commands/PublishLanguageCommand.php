@@ -23,7 +23,7 @@ class PublishLanguageCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('Publishing Laravel Launchpad language files...');
 
@@ -49,5 +49,7 @@ class PublishLanguageCommand extends Command
         $this->line('- resources/lang/vendor/launchpad/bn/');
         $this->line('');
         $this->line('To add more languages, create additional directories and translation files.');
+
+        return 0;
     }
 }

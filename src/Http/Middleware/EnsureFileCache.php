@@ -15,7 +15,7 @@ class EnsureFileCache
         $this->installationService = $installationService;
     }
 
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         // Force file-based cache during installation to avoid database dependency
         if (! $this->installationService->isInstalled()) {

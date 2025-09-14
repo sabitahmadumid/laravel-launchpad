@@ -11,7 +11,7 @@ class PublishLicenseStubCommand extends Command
 
     protected $description = 'Publish the license validator stub to the application';
 
-    public function handle()
+    public function handle(): int
     {
         $stubPath = __DIR__.'/../../stubs/EnvatoLicenseChecker.php.stub';
         $targetPath = app_path('Services/EnvatoLicenseChecker.php');
@@ -20,7 +20,7 @@ class PublishLicenseStubCommand extends Command
             if (! $this->confirm('License validator already exists. Do you want to overwrite it?')) {
                 $this->info('License validator publishing cancelled.');
 
-                return;
+                return 1;
             }
         }
 
@@ -38,5 +38,7 @@ class PublishLicenseStubCommand extends Command
         $this->line('Don\'t forget to update your .env file:');
         $this->line('LAUNCHPAD_LICENSE_VALIDATOR=App\\Services\\EnvatoLicenseChecker');
         $this->line('LAUNCHPAD_LICENSE_SERVER_URL=https://your-license-server.com/api/verify');
+
+        return 0;
     }
 }
