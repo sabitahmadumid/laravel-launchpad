@@ -2,6 +2,82 @@
 
 All notable changes to `laravel-launchpad` will be documented in this file.
 
+## [2.4.0] - 2025-09-15
+
+### 🔒 Simplified License System & Developer Experience Improvements
+
+This release introduces a streamlined license validation system designed to be both secure and developer-friendly, along with significant documentation improvements and codebase cleanup.
+
+### ✨ New Features
+
+- **🔒 Simplified License System**
+  - **SimpleLicenseValidator Only** - Removed complex validators, kept secure but simple system
+  - **Developer-Friendly Commands** - Simple enable/disable with route-specific controls
+  - **Route-Specific Bypasses** - Granular control for installation vs update routes
+  - **Enhanced Security** - Hard to bypass while maintaining developer convenience
+
+- **🛠️ Improved License Commands**
+  - **Unified Command Structure** - All license commands consolidated into logical groups
+  - **Route-Specific Options** - `--install` and `--update` flags for granular control
+  - **Development Keys** - Built-in bypass keys for local development
+  - **Force Options** - `--force` flag for automated scripts
+
+- **📚 Enhanced Documentation**
+  - **Complete License Examples** - Real-world Envato CodeCanyon integration
+  - **Custom Server Integration** - Full implementation examples
+  - **Streamlined README** - Focused on essential developer information
+  - **Consolidated Command Reference** - Single source for all license commands
+
+### 🧹 Codebase Cleanup
+
+- **Removed Duplicate Commands**
+  - Eliminated `PublishLicenseStubCommand` (old)
+  - Removed `LicenseCommand` (duplicate functionality)
+  - Cleaned up old stub files and directories
+
+- **Simplified Service Provider**
+  - Removed unused command registrations
+  - Clean imports and dependencies
+  - Updated to reflect current command structure
+
+- **Documentation Consolidation**
+  - Merged 3 separate license command sections into 1
+  - Removed outdated test references
+  - Updated configuration examples
+
+### 🔧 Technical Improvements
+
+- **PHPStan Level 8 Compliance** - All code passes strict static analysis
+- **Simplified Architecture** - Removed unnecessary complexity while maintaining functionality
+- **Better Error Handling** - Improved license validation error messages
+- **Environment Integration** - Streamlined .env configuration
+
+### 📊 License System Commands
+
+```bash
+# Basic License Management
+php artisan launchpad:license disable
+php artisan launchpad:license enable
+php artisan launchpad:license disable --install
+php artisan launchpad:license disable --update
+
+# Advanced Management
+php artisan launchpad:license status
+php artisan launchpad:license verify
+php artisan launchpad:license remove
+php artisan launchpad:license clear-cache
+
+# Development Commands
+php artisan launchpad:license enable-local
+php artisan launchpad:license disable-local
+```
+
+### 💡 Migration Notes
+
+- **License Validators**: Only `SimpleLicenseValidator` is supported (complex validators removed)
+- **Commands**: Use new `launchpad:license` commands instead of old `launchpad:license-disable`
+- **Configuration**: Simplified license config section in `config/launchpad.php`
+
 ## [2.3.0] - 2025-09-14
 
 ### 🌍 Complete Translation System & Multi-Language Support
