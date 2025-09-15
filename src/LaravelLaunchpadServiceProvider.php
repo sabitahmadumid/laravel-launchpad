@@ -2,10 +2,10 @@
 
 namespace SabitAhmad\LaravelLaunchpad;
 
+use SabitAhmad\LaravelLaunchpad\Commands\DisableLicenseCommand;
 use SabitAhmad\LaravelLaunchpad\Commands\LaravelLaunchpadCommand;
-use SabitAhmad\LaravelLaunchpad\Commands\LicenseCommand;
 use SabitAhmad\LaravelLaunchpad\Commands\PublishLanguageCommand;
-use SabitAhmad\LaravelLaunchpad\Commands\PublishLicenseStubCommand;
+use SabitAhmad\LaravelLaunchpad\Commands\PublishLicenseValidatorCommand;
 use SabitAhmad\LaravelLaunchpad\Http\Middleware\CheckInstallation;
 use SabitAhmad\LaravelLaunchpad\Http\Middleware\CheckLicense;
 use SabitAhmad\LaravelLaunchpad\Http\Middleware\RedirectIfInstalled;
@@ -30,8 +30,8 @@ class LaravelLaunchpadServiceProvider extends PackageServiceProvider
             ->hasMigration('create_launchpad_table')
             ->hasCommands([
                 LaravelLaunchpadCommand::class,
-                LicenseCommand::class,
-                PublishLicenseStubCommand::class,
+                DisableLicenseCommand::class,
+                PublishLicenseValidatorCommand::class,
                 PublishLanguageCommand::class,
             ]);
     }
