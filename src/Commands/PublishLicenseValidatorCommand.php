@@ -40,6 +40,7 @@ class PublishLicenseValidatorCommand extends Command
             $this->line('');
             $this->info('✅ SimpleLicenseValidator published successfully!');
             $this->showNextSteps();
+
             return self::SUCCESS;
         }
 
@@ -52,43 +53,47 @@ class PublishLicenseValidatorCommand extends Command
         $stubPath = $this->getStubPath($validator['file']);
         $targetPath = $this->getTargetPath($validator['file']);
 
-        if (!File::exists($stubPath)) {
+        if (! File::exists($stubPath)) {
             $this->error("❌ Stub file not found: {$stubPath}");
+
             return false;
         }
 
         // Check if target file exists
-        if (File::exists($targetPath) && !$this->option('force')) {
-            if (!$this->confirm("File {$targetPath} already exists. Overwrite?")) {
+        if (File::exists($targetPath) && ! $this->option('force')) {
+            if (! $this->confirm("File {$targetPath} already exists. Overwrite?")) {
                 $this->info("⏭️  Skipped {$validator['name']}");
+
                 return false;
             }
         }
 
         // Create directory if it doesn't exist
         $targetDir = dirname($targetPath);
-        if (!File::exists($targetDir)) {
+        if (! File::exists($targetDir)) {
             File::makeDirectory($targetDir, 0755, true);
         }
 
         // Copy the stub file
         if (File::copy($stubPath, $targetPath)) {
             $this->info("✅ Published {$validator['name']} to {$targetPath}");
+
             return true;
         }
 
         $this->error("❌ Failed to publish {$validator['name']}");
+
         return false;
     }
 
     protected function getStubPath(string $file): string
     {
-        return __DIR__ . '/../../database/stubs/' . $file . '.stub';
+        return __DIR__.'/../../database/stubs/'.$file.'.stub';
     }
 
     protected function getTargetPath(string $file): string
     {
-        return app_path('Services/' . $file);
+        return app_path('Services/'.$file);
     }
 
     protected function showNextSteps(): void

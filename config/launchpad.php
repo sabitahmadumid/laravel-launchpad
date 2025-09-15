@@ -85,19 +85,19 @@ return [
     |--------------------------------------------------------------------------
     | License Verification - SIMPLE & SECURE
     |--------------------------------------------------------------------------
-    | 
+    |
     | DEVELOPER-FRIENDLY LICENSE SYSTEM
-    | 
+    |
     | This license system provides a simple but secure license validation
     | with developer-friendly options for local development.
     |
     | 🚀 QUICK DEVELOPMENT SETUP:
-    | 
+    |
     |   Option 1: Disable license checks (Local/testing only)
     |   php artisan launchpad:license disable
     |   php artisan launchpad:license disable --install    # Disable for install routes only
     |   php artisan launchpad:license disable --update     # Disable for update routes only
-    | 
+    |
     |   Option 2: Use development license keys
     |   php artisan launchpad:license-stub publish
     |   Use license key: "dev-license-key" or other development keys
@@ -109,7 +109,7 @@ return [
     |
     | �️ COMMANDS:
     | php artisan launchpad:license disable               # Disable license checks
-    | php artisan launchpad:license enable                # Enable license checks  
+    | php artisan launchpad:license enable                # Enable license checks
     | php artisan launchpad:license disable --install     # Disable for install routes only
     | php artisan launchpad:license disable --update      # Disable for update routes only
     | php artisan launchpad:license-stub publish          # Publish validator stub
@@ -132,11 +132,11 @@ return [
         'development' => [
             // Accept development license keys in local environment
             'accept_dev_keys' => env('LAUNCHPAD_ACCEPT_DEV_KEYS', true),
-            
+
             // Development license keys that always work in local/testing
             'dev_keys' => [
                 'dev-license-key',
-                'local-development', 
+                'local-development',
                 'testing-license',
                 'bypass-license-check',
             ],
