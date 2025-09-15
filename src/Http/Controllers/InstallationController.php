@@ -35,17 +35,11 @@ class InstallationController extends Controller
         $this->licenseService = $licenseService;
     }
 
-    /**
-     * @return \Illuminate\View\View
-     */
     public function welcome(): View
     {
         return view('launchpad::install.welcome');
     }
 
-    /**
-     * @return \Illuminate\View\View
-     */
     public function requirements(): View
     {
         $requirements = $this->installationService->checkRequirements();
@@ -66,9 +60,6 @@ class InstallationController extends Controller
         ]);
     }
 
-    /**
-     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
-     */
     public function license(): View|RedirectResponse
     {
         if (! $this->licenseService->isLicenseRequired()) {
@@ -115,9 +106,6 @@ class InstallationController extends Controller
         ]);
     }
 
-    /**
-     * @return \Illuminate\View\View
-     */
     public function database(): View
     {
         $supportedDrivers = config('launchpad.database.supported_drivers', ['mysql']);
@@ -195,9 +183,6 @@ class InstallationController extends Controller
         }
     }
 
-    /**
-     * @return \Illuminate\View\View
-     */
     public function admin(): View
     {
         // Ensure language is properly initialized
@@ -260,9 +245,6 @@ class InstallationController extends Controller
         }
     }
 
-    /**
-     * @return \Illuminate\View\View
-     */
     public function final(): View
     {
         $databaseOptions = config('launchpad.database.import_options', []);
@@ -307,9 +289,6 @@ class InstallationController extends Controller
         }
     }
 
-    /**
-     * @return \Illuminate\View\View
-     */
     public function success(): View
     {
         $redirectUrl = config('launchpad.post_install.redirect_url', '/admin');

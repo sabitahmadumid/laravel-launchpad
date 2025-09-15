@@ -20,7 +20,7 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
     }
 
     /**
-     * @param array<string, mixed> $additionalData
+     * @param  array<string, mixed>  $additionalData
      * @return array<string, mixed>
      */
     public function validate(string $licenseKey, array $additionalData = []): array
@@ -48,7 +48,7 @@ class DefaultLicenseValidator implements LicenseValidatorInterface
     }
 
     /**
-     * @param array<string, mixed> $additionalData
+     * @param  array<string, mixed>  $additionalData
      * @return array<string, mixed>
      */
     protected function performValidation(string $licenseKey, array $additionalData): array

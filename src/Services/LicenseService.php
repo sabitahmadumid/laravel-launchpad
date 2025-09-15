@@ -62,7 +62,8 @@ class LicenseService
 
     /**
      * Validate license with the given key and automatically save to .env if valid
-     * @param array<string, mixed> $additionalData
+     *
+     * @param  array<string, mixed>  $additionalData
      * @return array<string, mixed>
      */
     public function validateLicense(string $licenseKey, array $additionalData = []): array
@@ -108,7 +109,7 @@ class LicenseService
 
         try {
             $envContent = file_get_contents($envFile);
-            
+
             if ($envContent === false) {
                 throw new \Exception('Could not read .env file');
             }
@@ -161,7 +162,7 @@ class LicenseService
         // Try storage file
         if (file_exists($this->licenseFile)) {
             $encrypted = file_get_contents($this->licenseFile);
-            
+
             if ($encrypted === false) {
                 return null;
             }
@@ -281,11 +282,11 @@ class LicenseService
 
         try {
             $encrypted = file_get_contents($flagFile);
-            
+
             if ($encrypted === false) {
                 return false;
             }
-            
+
             $decrypted = decrypt($encrypted);
 
             return $decrypted === 'enforce_license_locally';
@@ -341,8 +342,8 @@ class LicenseService
     protected function hasGlobalBypass(): bool
     {
         $bypassFile = storage_path('app/.license_bypass_global');
-        
-        if (!file_exists($bypassFile)) {
+
+        if (! file_exists($bypassFile)) {
             return false;
         }
 
@@ -351,10 +352,10 @@ class LicenseService
             if ($encrypted === false) {
                 return false;
             }
-            
+
             $decrypted = decrypt($encrypted);
             $data = json_decode($decrypted, true);
-            
+
             // Validate bypass data structure
             return is_array($data) && isset($data['created_at']);
         } catch (\Exception $e) {
@@ -368,17 +369,17 @@ class LicenseService
     protected function hasRouteSpecificBypass(): bool
     {
         $currentRoute = request()->route();
-        if (!$currentRoute) {
+        if (! $currentRoute) {
             return false;
         }
 
         $routeName = $currentRoute->getName() ?? '';
-        
+
         // Check for installation route bypasses
         if (str_contains($routeName, 'install')) {
             return $this->hasSpecificBypass('install');
         }
-        
+
         // Check for update route bypasses
         if (str_contains($routeName, 'update')) {
             return $this->hasSpecificBypass('update');
@@ -393,8 +394,8 @@ class LicenseService
     protected function hasSpecificBypass(string $type): bool
     {
         $bypassFile = storage_path("app/.license_bypass_{$type}");
-        
-        if (!file_exists($bypassFile)) {
+
+        if (! file_exists($bypassFile)) {
             return false;
         }
 
@@ -403,13 +404,13 @@ class LicenseService
             if ($encrypted === false) {
                 return false;
             }
-            
+
             $decrypted = decrypt($encrypted);
             $data = json_decode($decrypted, true);
-            
+
             // Validate bypass data structure and type
-            return is_array($data) && 
-                   isset($data['type']) && 
+            return is_array($data) &&
+                   isset($data['type']) &&
                    $data['type'] === $type &&
                    isset($data['created_at']);
         } catch (\Exception $e) {
@@ -419,6 +420,7 @@ class LicenseService
 
     /**
      * Get license status information
+     *
      * @return array<string, mixed>
      */
     public function getLicenseStatus(): array

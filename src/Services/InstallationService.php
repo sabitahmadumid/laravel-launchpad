@@ -26,7 +26,7 @@ class InstallationService
             'installed_at' => now()->toISOString(),
             'version' => config('launchpad.update.current_version', '1.0.0'),
         ]);
-        
+
         if ($content === false) {
             throw new \Exception('Failed to encode installation data');
         }
@@ -91,7 +91,7 @@ class InstallationService
     }
 
     /**
-     * @param array<string, mixed> $phpConfig
+     * @param  array<string, mixed>  $phpConfig
      * @return array<string, mixed>
      */
     protected function checkPhpVersion(array $phpConfig): array
@@ -110,7 +110,7 @@ class InstallationService
     }
 
     /**
-     * @param array<string, mixed> $extensionsConfig
+     * @param  array<string, mixed>  $extensionsConfig
      * @return array<string, mixed>
      */
     protected function checkExtensions(array $extensionsConfig): array
@@ -132,7 +132,7 @@ class InstallationService
     }
 
     /**
-     * @param array<string, mixed> $directoriesConfig
+     * @param  array<string, mixed>  $directoriesConfig
      * @return array<string, mixed>
      */
     protected function checkDirectories(array $directoriesConfig): array
@@ -155,7 +155,7 @@ class InstallationService
     }
 
     /**
-     * @param array<string, mixed> $functionsConfig
+     * @param  array<string, mixed>  $functionsConfig
      * @return array<string, mixed>
      */
     protected function checkFunctions(array $functionsConfig): array

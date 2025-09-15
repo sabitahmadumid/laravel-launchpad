@@ -28,9 +28,10 @@ class DisableLicenseCommand extends Command
     {
         $action = $this->argument('action');
 
-        if (!in_array($action, ['enable', 'disable'])) {
+        if (! in_array($action, ['enable', 'disable'])) {
             $this->error('❌ Invalid action. Use "enable" or "disable".');
             $this->showUsage();
+
             return 1;
         }
 
@@ -43,7 +44,7 @@ class DisableLicenseCommand extends Command
     protected function enableLicense(): int
     {
         $this->info('🔐 Enabling license verification...');
-        
+
         if ($this->option('install')) {
             $this->enableForInstallation();
             $this->info('✅ License verification enabled for installation routes.');
@@ -56,15 +57,17 @@ class DisableLicenseCommand extends Command
         }
 
         $this->showStatus();
+
         return 0;
     }
 
     protected function disableLicense(): int
     {
         // Check if we're in a safe environment
-        if ($this->isProductionEnvironment() && !$this->option('force')) {
+        if ($this->isProductionEnvironment() && ! $this->option('force')) {
             $this->error('❌ Cannot disable license verification in production environment.');
             $this->warn('💡 Use --force flag only if you know what you are doing.');
+
             return 1;
         }
 
@@ -83,6 +86,7 @@ class DisableLicenseCommand extends Command
 
         $this->showWarnings();
         $this->showStatus();
+
         return 0;
     }
 
@@ -149,28 +153,28 @@ class DisableLicenseCommand extends Command
         $this->line('');
         $this->info('� Current License Status:');
         $this->line('==========================');
-        
+
         $env = app()->environment();
         $this->line("Environment: <fg=cyan>{$env}</>");
-        
+
         $isRequired = $this->licenseService->isLicenseRequired();
-        $this->line('License Required: ' . ($isRequired ? '<fg=red>Yes</>' : '<fg=green>No</>'));
-        
+        $this->line('License Required: '.($isRequired ? '<fg=red>Yes</>' : '<fg=green>No</>'));
+
         // Check specific bypasses
         $installBypass = File::exists(storage_path('app/.license_bypass_install'));
         $updateBypass = File::exists(storage_path('app/.license_bypass_update'));
         $globalBypass = File::exists(storage_path('app/.license_bypass_global'));
-        
+
         $this->line('');
         $this->info('🚫 Active Bypasses:');
-        $this->line('Installation Routes: ' . ($installBypass ? '<fg=yellow>Disabled</>' : '<fg=green>Enabled</>'));
-        $this->line('Update Routes: ' . ($updateBypass ? '<fg=yellow>Disabled</>' : '<fg=green>Enabled</>'));
-        $this->line('Global Bypass: ' . ($globalBypass ? '<fg=red>Active</>' : '<fg=gray>Inactive</>'));
+        $this->line('Installation Routes: '.($installBypass ? '<fg=yellow>Disabled</>' : '<fg=green>Enabled</>'));
+        $this->line('Update Routes: '.($updateBypass ? '<fg=yellow>Disabled</>' : '<fg=green>Enabled</>'));
+        $this->line('Global Bypass: '.($globalBypass ? '<fg=red>Active</>' : '<fg=gray>Inactive</>'));
 
         if ($isRequired) {
             $status = $this->licenseService->getLicenseStatus();
             $this->line('');
-            $this->line('License Valid: ' . ($status['is_valid'] ? '<fg=green>Yes</>' : '<fg=red>No</>'));
+            $this->line('License Valid: '.($status['is_valid'] ? '<fg=green>Yes</>' : '<fg=red>No</>'));
             if (isset($status['message'])) {
                 $this->line("Status: {$status['message']}");
             }
