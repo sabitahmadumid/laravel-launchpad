@@ -195,7 +195,7 @@ GET /launchpad/language/current
 
 ## 🔒 License System
 
-Laravel Launchpad includes a simple but secure license validation system designed to be developer-friendly while preventing easy bypassing.
+Laravel Launchpad includes a robust license validation system that **automatically** handles license key storage during the installation and update process. Users simply enter their license key during setup, and the system handles everything automatically.
 
 ### Quick Setup
 
@@ -214,6 +214,52 @@ Laravel Launchpad includes a simple but secure license validation system designe
    ```bash
    php artisan launchpad:license disable
    ```
+
+### How It Works
+
+#### During Installation/Update Flow
+1. **User enters license key** in the installation or update wizard
+2. **System validates** the license with your license server
+3. **Automatic storage** - If valid, the license key is automatically saved to the project's `.env` file
+4. **Future verification** - The `isLicenseVerified()` method automatically checks the stored license
+
+#### For Developers (Simple API)
+```php
+use SabitAhmad\LaravelLaunchpad\Services\LicenseService;
+
+$licenseService = app(LicenseService::class);
+
+// Simple boolean check - handles everything automatically
+if ($licenseService->isLicenseVerified()) {
+    // License is valid, proceed with functionality
+    return view('premium-feature');
+} else {
+    // License is invalid or missing
+    return redirect()->route('license.required');
+}
+```
+
+### Security Features
+
+- **Automatic Environment Storage**: License keys automatically saved to `.env` file during verification
+- **Encrypted Local Backup**: Secondary encrypted storage with restricted permissions
+- **Bypass Protection**: Cannot be easily disabled via config manipulation in production
+- **Grace Period**: Temporary failures don't immediately block access
+- **Retry Mechanism**: Automatic retry with exponential backoff for network issues
+- **🔒 Secure by Default** - Hard to bypass for normal users
+- **👨‍💻 Developer Friendly** - Easy disable options and development keys
+- **🎛️ Route-Specific Control** - Disable license checks for specific routes
+- **🔄 Flexible Validation** - Support for multiple license server types
+- **💾 Encrypted Storage** - Secure bypass file storage
+- **🌍 Domain Binding** - License validation tied to specific domains
+
+### Development License Keys
+
+For local development, these keys work automatically:
+- `dev-license-key`
+- `local-development`
+- `testing-license`
+- `bypass-license-check`
 
 ### License Commands
 
@@ -269,16 +315,6 @@ php artisan launchpad:license disable-local
 ```
 
 **Note**: Local enforcement commands only work in local development environment and use encrypted flags for security.
-
-### Development License Keys
-
-For local development, these keys work automatically:
-- `dev-license-key`
-- `local-development`
-- `testing-license`
-- `bypass-license-check`
-
-### Custom License Validators
 
 #### Envato CodeCanyon Integration
 
@@ -492,14 +528,7 @@ ENVATO_API_TOKEN=your-envato-api-token
 LAUNCHPAD_LICENSE_SERVER=https://your-license-server.com/api/validate
 ```
 
-### License System Features
-
-- **🔒 Secure by Default** - Hard to bypass for normal users
-- **👨‍💻 Developer Friendly** - Easy disable options and development keys
-- **🎛️ Route-Specific Control** - Disable license checks for specific routes
-- **🔄 Flexible Validation** - Support for multiple license server types
-- **💾 Encrypted Storage** - Secure bypass file storage
-- **🌍 Domain Binding** - License validation tied to specific domains
+### Custom License Validators
 
 ## ⚙️ Configuration
 
@@ -1001,153 +1030,6 @@ $canConnect = $databaseService->testConnection([
 ]);
 ```
 
-## � Multi-Language Support
-
-Laravel Launchpad includes a powerful translation system that supports multiple languages out of the box. Users can switch languages during installation using the built-in language selector.
-
-### Available Languages
-
-- **English** (en) - Default language
-- **Bengali** (bn) - বাংলা
-
-### Language Switching
-
-Users can switch languages at any time during installation using the dropdown selector in the top-right corner. The selected language is automatically saved and persists throughout the installation process.
-
-### Adding New Languages
-
-To add support for additional languages:
-
-1. **Create language directory:**
-   ```bash
-   mkdir -p resources/lang/{locale}
-   ```
-
-2. **Copy English translation files:**
-   ```bash
-   cp resources/lang/en/install.php resources/lang/{locale}/
-   cp resources/lang/en/common.php resources/lang/{locale}/
-   ```
-
-3. **Translate the content:** Edit the copied files and translate all values while keeping the keys unchanged.
-
-4. **Update language selector:** Add your language to the language selector by modifying the view or using the configuration.
-
-### Translation Structure
-
-The translation system uses a hierarchical structure:
-
-```php
-// Field labels
-'fields' => [
-    'admin' => [
-        'name' => 'Full Name',
-        'email' => 'Email Address',
-        'password' => 'Password',
-    ],
-    'site_settings' => [
-        'app_name' => 'Application Name',
-        'app_url' => 'Application URL',
-    ],
-],
-
-// Field placeholders
-'field_placeholders' => [
-    'name' => 'Enter your full name',
-    'email' => 'Enter your email address',
-    'app_name' => 'My Laravel App',
-],
-
-// Select options
-'field_options' => [
-    'mail_mailer' => [
-        'smtp' => 'SMTP',
-        'sendmail' => 'Sendmail',
-        'mailgun' => 'Mailgun',
-    ],
-],
-```
-
-### Automatic Field Translation
-
-The system automatically translates dynamic form fields based on naming conventions. You don't need to modify your configuration - just add translations and they'll be picked up automatically:
-
-```php
-// Configuration (no changes needed)
-'admin' => [
-    'fields' => [
-        'name' => [
-            'type' => 'text',
-            'required' => true,
-        ],
-    ],
-],
-
-// Translation file (resources/lang/{locale}/install.php)
-'fields' => [
-    'admin' => [
-        'name' => 'Your Translation Here',
-    ],
-],
-```
-
-### Programmatic Language Control
-
-You can also control the language programmatically:
-
-```php
-// Set language via route
-POST /install/language
-{
-    "locale": "bn"
-}
-
-// Get current language
-GET /install/language/current
-```
-
-## �🎨 Customization
-
-### Views
-
-You can customize all views by publishing them:
-
-```bash
-php artisan vendor:publish --tag="laravel-launchpad-views"
-```
-
-Views are located in:
-- `resources/views/vendor/launchpad/install/` - Installation wizard views
-- `resources/views/vendor/launchpad/update/` - Update wizard views
-- `resources/views/vendor/launchpad/layout.blade.php` - Main layout
-
-### Styling
-
-The package uses Tailwind CSS via CDN. You can:
-
-1. **Override CSS** - Add custom styles to your layout
-2. **Replace CDN** - Use your own Tailwind build
-3. **Customize Components** - Modify the view files directly
-
-### License Validation
-
-Implement custom license validation:
-
-```php
-// In your license server
-Route::post('/validate', function (Request $request) {
-    $licenseKey = $request->input('license_key');
-    
-    // Your validation logic
-    
-    return response()->json([
-        'valid' => true,
-        'message' => 'License is valid',
-        'expires_at' => '2024-12-31',
-    ]);
-});
-```
-
 ## 🛡️ Security
 
 The package includes several security measures:
@@ -1226,200 +1108,6 @@ php artisan route:clear
 - **Clear Progress Indicators**: Users see exactly what's happening
 - **Better Error Handling**: Graceful failures with helpful messages  
 - **Simpler Deployment**: Update config, deploy files, share URL
-
-## 🔐 Enhanced License System
-
-Laravel Launchpad includes a robust license validation system that **automatically** handles license key storage during the installation and update process. Users simply enter their license key during setup, and the system handles everything automatically.
-
-### � How It Works
-
-#### During Installation/Update Flow
-1. **User enters license key** in the installation or update wizard
-2. **System validates** the license with your license server
-3. **Automatic storage** - If valid, the license key is automatically saved to the project's `.env` file
-4. **Future verification** - The `isLicenseVerified()` method automatically checks the stored license
-
-#### For Developers (Simple API)
-```php
-use SabitAhmad\LaravelLaunchpad\Services\LicenseService;
-
-$licenseService = app(LicenseService::class);
-
-// Simple boolean check - handles everything automatically
-if ($licenseService->isLicenseVerified()) {
-    // License is valid, proceed with functionality
-    return view('premium-feature');
-} else {
-    // License is invalid or missing
-    return redirect()->route('license.required');
-}
-```
-
-### 🛡️ Security Features
-
-- **Automatic Environment Storage**: License keys automatically saved to `.env` file during verification
-- **Encrypted Local Backup**: Secondary encrypted storage with restricted permissions
-- **Bypass Protection**: Cannot be easily disabled via config manipulation in production
-- **Grace Period**: Temporary failures don't immediately block access
-- **Retry Mechanism**: Automatic retry with exponential backoff for network issues
-
-### ⚙️ Optional Environment Configuration
-
-While license keys are automatically managed, you can optionally configure these settings in your `.env` file:
-
-```bash
-# Optional: License server URL (if using remote validation)
-LAUNCHPAD_LICENSE_SERVER=https://your-license-server.com/api/validate
-
-# Optional: Custom license validator class
-LAUNCHPAD_VALIDATOR_CLASS=App\\Services\\CustomLicenseValidator
-
-# Optional: Request timeout and cache duration
-LAUNCHPAD_LICENSE_TIMEOUT=30
-LAUNCHPAD_LICENSE_CACHE=3600
-```
-
-**Note**: The `LAUNCHPAD_LICENSE_KEY` is automatically added to your `.env` file when users verify their license during installation or update.
-
-**IMPORTANT SECURITY NOTICE**: License validation **cannot be disabled via configuration** in production environments. This is by design to prevent easy bypassing.
-
-### 📊 Detailed License Information
-
-For more detailed license information in your application:
-
-```php
-$licenseService = app(LicenseService::class);
-
-// Get comprehensive license status
-$status = $licenseService->getLicenseStatus();
-/*
-Returns array:
-[
-    'has_license' => true,
-    'is_valid' => true,
-    'source' => 'environment', // 'environment' or 'storage'
-    'message' => 'License is valid'
-]
-*/
-
-// Check if license validation is required
-if ($licenseService->isLicenseRequired()) {
-    // License validation is enabled
-}
-```
-
-### 🔧 Custom License Validator
-
-Create your own license validator by implementing the `LicenseValidatorInterface`:
-
-```php
-<?php
-
-namespace App\Services;
-
-use SabitAhmad\LaravelLaunchpad\Contracts\LicenseValidatorInterface;
-
-class CustomLicenseValidator implements LicenseValidatorInterface
-{
-    public function validate(string $licenseKey, array $additionalData = []): array
-    {
-        // Your custom validation logic here
-        $isValid = $this->performCustomValidation($licenseKey, $additionalData);
-        
-        return [
-            'valid' => $isValid,
-            'message' => $isValid ? 'License is valid' : 'License validation failed',
-            'data' => [], // Additional data if needed
-        ];
-    }
-    
-    private function performCustomValidation(string $licenseKey, array $data): bool
-    {
-        // Implement your license validation logic
-        // Could be API calls, database checks, file validation, etc.
-        return true; // or false
-    }
-}
-```
-
-Then register it in your `.env` file:
-```bash
-LAUNCHPAD_VALIDATOR_CLASS=App\\Services\\CustomLicenseValidator
-```
-
-### � End User Experience
-
-#### Installation Process
-1. User visits `/install` route
-2. Goes through requirements check
-3. **Enters license key** in the license verification step
-4. System automatically validates and stores the license key
-5. Continues with database setup and admin creation
-6. Installation complete - license key is ready for use
-
-#### Update Process
-1. User visits `/update` route
-2. Goes through requirements check
-3. **Enters license key** in the license verification step (if not already stored)
-4. System automatically validates and stores/updates the license key
-5. Continues with update process
-6. Update complete - license key is ready for use
-
-### �🛠️ Troubleshooting
-
-#### License Not Found After Installation
-```bash
-# Check current status (see License Commands section for all options)
-php artisan launchpad:license status
-
-# If needed, manually verify (will auto-save to .env)
-php artisan launchpad:license verify
-```
-
-#### Validation Failures
-```bash
-# Clear cache and retry (see License Commands section for all options)
-php artisan launchpad:license clear-cache
-
-# Check if license exists in environment
-php artisan launchpad:license status
-```
-
-#### Permission Issues
-```bash
-# Fix storage permissions if needed
-chmod 600 storage/app/.license
-
-# Check .env file permissions
-ls -la .env
-```
-
-### 🔄 Migration from Old System
-
-If you're upgrading from an older version where users manually added license keys:
-
-**Before (Manual)**:
-```bash
-# Users had to manually add to .env
-LAUNCHPAD_LICENSE_KEY=manually-added-key
-```
-
-**After (Automatic)**:
-- Users enter license key during installation/update flow
-- System automatically adds `LAUNCHPAD_LICENSE_KEY=their-key` to `.env`
-- Developers use simple `isLicenseVerified()` method
-
-### 🏢 Production Best Practices
-
-1. **Use the automatic flow** - Let users enter license keys during installation/update
-2. **Monitor license validation** - Set up alerts for validation failures
-3. **Use HTTPS for license server** - Ensure encrypted communication
-4. **Regular backups** - Include `.env` file in backups
-5. **Grace period configuration** - Allow temporary server outages
-6. **Log license events** - Track validation attempts and failures
-
-
-## 📝 Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
