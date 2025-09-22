@@ -370,7 +370,7 @@ class EnvatoLicenseValidator implements LicenseValidatorInterface
 
     private function validateWithEnvato(string $purchaseCode): array
     {
-        $token = config('services.envato.token');
+        $token = env('ENVATO_API_TOKEN');
         
         if (!$token) {
             throw new \Exception('Envato API token not configured');
