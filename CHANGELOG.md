@@ -2,6 +2,52 @@
 
 All notable changes to `laravel-launchpad` will be documented in this file.
 
+## [2.5.0] - 2025-09-24
+
+### 🌍 Complete Translation System & Code Optimization
+
+This release focuses on completing the internationalization system and optimizing the codebase by removing unused files and fixing translation support across all views.
+
+### ✨ New Features
+
+- **🌍 Complete Translation Support**
+  - **Update Views Internationalized** - All update wizard views now support multi-language
+  - **Translation Keys Added** - Added missing translation keys for directory permissions, PHP extensions
+  - **Bengali Translation Complete** - Full Bengali translation support for all views
+  - **Consistent Translation Pattern** - Unified translation structure across install and update flows
+
+### 🛠️ Improvements
+
+- **📝 README Optimization**
+  - **Removed Duplicates** - Eliminated duplicate license and multi-language sections
+  - **Consolidated Content** - Streamlined documentation from 1442 to 1129 lines (22% reduction)
+  - **Better Organization** - Improved flow and readability while maintaining completeness
+
+- **🧹 Codebase Cleanup**
+  - **Removed Unused Files** - Deleted unused `config/services.php` file and references
+  - **Fixed Documentation** - Updated README examples to use proper environment variables
+  - **Translation Fixes** - All hardcoded English text replaced with translation keys
+
+### 🔧 Technical Changes
+
+- **Translation System**
+  - Added `php_extensions`, `directory_permissions`, `exists`, `missing`, `writable`, `not_writable` keys
+  - Added `before_you_update`, `update_process_steps` keys
+  - Fixed all update views: welcome, requirements, license, update process, and success pages
+  - Bengali translations updated to match English structure
+
+- **Documentation**
+  - Removed duplicate "Enhanced License System" section
+  - Removed duplicate "Multi-Language Support" section  
+  - Consolidated license commands into single comprehensive section
+  - Fixed README examples to use `env()` directly instead of unused config
+
+### 📦 Migration Notes
+
+- **No Breaking Changes** - All existing functionality preserved
+- **Translation Keys** - New translation keys automatically available
+- **Removed Files** - `config/services.php` removed (was unused)
+
 ## [2.4.0] - 2025-09-15
 
 ### 🔒 Simplified License System & Developer Experience Improvements
