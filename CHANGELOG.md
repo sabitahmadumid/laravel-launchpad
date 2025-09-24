@@ -2,6 +2,27 @@
 
 All notable changes to `laravel-launchpad` will be documented in this file.
 
+## [2.6.0] - 2025-09-24
+
+### 🏗️ Package Structure Improvements
+
+This release focuses on improving the Laravel package structure by following Laravel conventions for stub placement and updating all related code paths.
+
+### ✨ Improvements
+
+- **📁 Stub Directory Restructuring**
+  - **Laravel Convention Compliance** - Moved stubs from `database/stubs/` to root-level `stubs/` directory
+  - **Updated Path Resolution** - Modified `PublishLicenseValidatorCommand` to use new stub location
+  - **Better Package Structure** - Follows Laravel package development best practices
+  - **Cleaner Organization** - Simplified file structure for better maintainability
+
+### 🔧 Technical Changes
+
+- Updated `PublishLicenseValidatorCommand::getStubPath()` method
+- Changed stub path from `__DIR__.'/../../database/stubs/'` to `__DIR__.'/../../stubs/'`
+- Moved `SimpleLicenseValidator.php.stub` to new location
+- Maintained backward compatibility for existing implementations
+
 ## [2.5.0] - 2025-09-24
 
 ### 🌍 Complete Translation System & Code Optimization

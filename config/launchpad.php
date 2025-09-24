@@ -23,7 +23,7 @@ return [
         'route_prefix' => 'update',
         'route_middleware' => ['web'],
         'version_file' => storage_path('app/version.lock'),
-        'current_version' => '2.5.0',
+        'current_version' => '2.6.0',
     ],
 
     /*
