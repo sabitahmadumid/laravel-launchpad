@@ -88,7 +88,7 @@ class PublishLicenseValidatorCommand extends Command
 
     protected function getStubPath(string $file): string
     {
-        return __DIR__.'/../../database/stubs/'.$file.'.stub';
+        return __DIR__.'/../../stubs/'.$file.'.stub';
     }
 
     protected function getTargetPath(string $file): string
