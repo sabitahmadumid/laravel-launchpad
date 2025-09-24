@@ -72,4 +72,6 @@ return [
     'updating' => 'Updating...',
     'please_wait_updating' => 'Please wait while we update your application.',
     'backup_recommended' => 'It is recommended to backup your application before updating.',
+    'before_you_update' => 'Before You Update',
+    'update_process_steps' => 'Update Process Steps',
 ];

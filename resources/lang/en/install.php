@@ -37,7 +37,12 @@ return [
     'requirements_all_met' => 'All requirements are met! You can proceed to the next step.',
     'requirements_some_failed' => 'Some requirements are not met. Please fix them before continuing.',
     'php_version' => 'PHP Version',
-    'extensions' => 'PHP Extensions',
+    'php_extensions' => 'PHP Extensions',
+    'directory_permissions' => 'Directory Permissions',
+    'exists' => 'Exists',
+    'missing' => 'Missing',
+    'writable' => 'Writable',
+    'not_writable' => 'Not Writable',
     'permissions' => 'File Permissions',
     'directories' => 'Directory Access',
 

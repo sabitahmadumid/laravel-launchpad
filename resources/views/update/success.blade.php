@@ -1,6 +1,6 @@
 @extends('launchpad::layout')
 
-@section('title', 'Update Complete')
+@section('title', __('launchpad::update.success_title'))
 
 @section('content')
 <div class="space-y-6">
@@ -12,38 +12,38 @@
                 </svg>
             </div>
             
-            <h2 class="text-4xl font-bold text-gray-900 mb-4">🎉 Update Complete!</h2>
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">🎉 {{ __('launchpad::update.success_title') }}</h2>
             <p class="text-xl text-gray-600 mb-8">
-                Congratulations! {{ config('launchpad.ui.app_name', 'Your application') }} has been successfully updated to version {{ $newVersion }}.
+                {{ __('launchpad::update.success_message') }}
             </p>
 
             <!-- Update Summary -->
             <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-8 max-w-2xl mx-auto">
-                <h3 class="text-lg font-semibold text-green-900 mb-4">What was updated:</h3>
+                <h3 class="text-lg font-semibold text-green-900 mb-4">{{ __('launchpad::update.update_completed') }}:</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-left">
                     <div class="flex items-center space-x-2">
                         <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
-                        <span class="text-green-800">Application files updated</span>
+                        <span class="text-green-800">{{ __('launchpad::update.update_completed') }}</span>
                     </div>
                     <div class="flex items-center space-x-2">
                         <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
-                        <span class="text-green-800">Database migrated</span>
+                        <span class="text-green-800">{{ __('launchpad::update.run_migrations') }}</span>
                     </div>
                     <div class="flex items-center space-x-2">
                         <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
-                        <span class="text-green-800">Cache optimized</span>
+                        <span class="text-green-800">{{ __('launchpad::update.clear_cache') }}</span>
                     </div>
                     <div class="flex items-center space-x-2">
                         <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
-                        <span class="text-green-800">Version updated</span>
+                        <span class="text-green-800">{{ __('launchpad::update.new_version_installed') }}</span>
                     </div>
                     <div class="flex items-center space-x-2">
                         <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">

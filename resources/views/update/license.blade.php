@@ -1,6 +1,6 @@
 @extends('launchpad::layout')
 
-@section('title', 'Update License Verification')
+@section('title', __('launchpad::update.license_title'))
 
 @section('content')
 <div x-data="updateLicenseVerifier()" class="space-y-6">
@@ -12,23 +12,23 @@
                 </svg>
             </div>
             
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">License Verification</h2>
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">{{ __('launchpad::update.license_title') }}</h2>
             <p class="text-lg text-gray-600">
-                Please verify your license to proceed with the update.
+                {{ __('launchpad::update.license_description') }}
             </p>
         </div>
 
         <form @submit.prevent="verifyLicense()" class="max-w-md mx-auto space-y-6">
             <div>
                 <label for="license_key" class="block text-sm font-medium text-gray-700 mb-2">
-                    License Key / Purchase Code
+                    {{ __('launchpad::update.license_key') }}
                 </label>
                 <input 
                     type="text" 
                     id="license_key"
                     x-model="licenseKey"
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter your license key"
+                    placeholder="{{ __('launchpad::update.license_key_placeholder') }}"
                     required
                     :disabled="loading || verified"
                 >
@@ -69,13 +69,13 @@
                 :disabled="loading || !licenseKey.trim() || verified"
                 class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-                <span x-show="!loading">Verify License</span>
+                <span x-show="!loading">{{ __('launchpad::update.verify_license') }}</span>
                 <span x-show="loading" x-cloak class="flex items-center justify-center space-x-2">
                     <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span>Verifying...</span>
+                    <span>{{ __('launchpad::common.validating') }}</span>
                 </span>
             </button>
         </form>
@@ -84,14 +84,14 @@
         <div class="flex justify-between items-center pt-6 border-t mt-8">
             <a href="{{ route('launchpad.update.requirements') }}" 
                class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200">
-                ← Back
+                ← {{ __('launchpad::common.back') }}
             </a>
             
             <a x-show="verified" 
                href="{{ route('launchpad.update.update') }}" 
                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
                x-cloak>
-                Continue →
+                {{ __('launchpad::common.continue') }} →
             </a>
         </div>
     </div>
