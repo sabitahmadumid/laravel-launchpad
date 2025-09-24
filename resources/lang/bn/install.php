@@ -37,7 +37,12 @@ return [
     'requirements_all_met' => 'সমস্ত প্রয়োজনীয়তা পূরণ হয়েছে! আপনি পরবর্তী ধাপে এগিয়ে যেতে পারেন।',
     'requirements_some_failed' => 'কিছু প্রয়োজনীয়তা পূরণ হয়নি। অনুগ্রহ করে এগিয়ে যাওয়ার আগে তা ঠিক করুন।',
     'php_version' => 'PHP সংস্করণ',
-    'extensions' => 'PHP এক্সটেনশন',
+    'php_extensions' => 'PHP এক্সটেনশন',
+    'directory_permissions' => 'ডিরেক্টরি অনুমতি',
+    'exists' => 'বিদ্যমান',
+    'missing' => 'অনুপস্থিত',
+    'writable' => 'লেখার যোগ্য',
+    'not_writable' => 'লেখার যোগ্য নয়',
     'permissions' => 'ফাইল অনুমতি',
     'directories' => 'ডিরেক্টরি অ্যাক্সেস',
 
