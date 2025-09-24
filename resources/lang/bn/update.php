@@ -2,7 +2,7 @@
 
 return [
     'title' => 'আপডেট উইজার্ড',
-    'welcome_title' =>  'স্বাগতম', // Common messages
+    'welcome_title' => 'স্বাগতম', // Common messages
     'processing' => 'প্রক্রিয়াকরণ...',
     'updating' => 'আপডেট করা হচ্ছে...',
     'please_wait_updating' => 'আপনার অ্যাপ্লিকেশন আপডেট করার সময় অনুগ্রহ করে অপেক্ষা করুন।',
